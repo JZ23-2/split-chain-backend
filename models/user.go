@@ -1,6 +1,6 @@
 package models
 
 type User struct {
-	Wallet   string `json:"wallet"`
-	Username string `json:"username"`
+	UserID string `gorm:"primaryKey" json:"userId"`
+	Wallet string `gorm:"unique" json:"wallet"`
 }

@@ -1,4 +1,12 @@
 basePath: /api/v1
+definitions:
+  models.User:
+    properties:
+      userId:
+        type: string
+      wallet:
+        type: string
+    type: object
 info:
   contact:
     email: Jacksontpa7@gmail.com
@@ -6,9 +14,9 @@ info:
     name: MIT
   version: "1.0"
 paths:
-  /confirm-payment:
+  /check:
     get:
-      description: confirms a payment on Hedera
+      description: Check backend health
       produces:
       - application/json
       responses:
@@ -17,7 +25,62 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Confirm a payment
+      summary: Check backend health
       tags:
       - Payment
+  /confirm-payment:
+    get:
+      description: example return confirms a payment on Hedera
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Example confirm a payment
+      tags:
+      - Payment
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Save wallet address to database
+      parameters:
+      - description: User info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a new user
+      tags:
+      - users
 swagger: "2.0"
