@@ -1,0 +1,48 @@
+{
+	"info": {
+		"_postman_id": "5019fef7-778c-47d5-ab47-3c18ade0a27a",
+		"name": "SplitChain",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31372565"
+	},
+	"item": [
+		{
+			"name": "Bill",
+			"item": [
+				{
+					"name": "Create Bill",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"billTitle\": \"Dinner at Cafe\",\n  \"totalAmount\": 200000,\n  \"creatorId\": \"user123\",\n  \"participants\": [\n    {\n      \"participantId\": \"user123\",\n      \"amountOwed\": 100000,\n      \"isPaid\": true,\n      \"items\": [\n        { \"name\": \"Steak\", \"price\": 80000 },\n        { \"name\": \"Drink\", \"price\": 20000 }\n      ]\n    },\n    {\n      \"participantId\": \"user456\",\n      \"amountOwed\": 100000,\n      \"isPaid\": false,\n      \"items\": [\n        { \"name\": \"Pasta\", \"price\": 70000 },\n        { \"name\": \"Dessert\", \"price\": 30000 }\n      ]\n    }\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/create-bill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"create-bill"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
