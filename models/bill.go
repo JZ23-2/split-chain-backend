@@ -4,7 +4,7 @@ import "time"
 
 type Bill struct {
 	BillID       string        `gorm:"primaryKey;type:varchar(255)" json:"billId"`
-	Title        string        `gorm:"type:varchar(100)" json:"title"`
+	BillTitle    string        `gorm:"type:varchar(100)" json:"billTitle"`
 	TotalAmount  int           `gorm:"type:int(10)" json:"totalAmount"`
 	CreatorID    string        `gorm:"type:varchar(255)" json:"creatorId"`
 	Creator      User          `gorm:"foreignKey:CreatorID" json:"creator"`
