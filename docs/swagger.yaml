@@ -1,5 +1,93 @@
 basePath: /api/v1
 definitions:
+  dtos.CreateBillRequest:
+    properties:
+      billTitle:
+        example: Dinner at Cafe
+        type: string
+      creatorId:
+        example: user123
+        type: string
+      participants:
+        items:
+          $ref: '#/definitions/dtos.CreateParticipantRequest'
+        type: array
+      totalAmount:
+        example: 200000
+        type: integer
+    type: object
+  dtos.CreateItemRequest:
+    properties:
+      name:
+        example: Steak
+        type: string
+      price:
+        example: 80000
+        type: integer
+    type: object
+  dtos.CreateParticipantRequest:
+    properties:
+      amountOwed:
+        example: 100000
+        type: integer
+      isPaid:
+        example: true
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/dtos.CreateItemRequest'
+        type: array
+      participantId:
+        example: user123
+        type: string
+    type: object
+  models.Bill:
+    properties:
+      billId:
+        type: string
+      billTitle:
+        type: string
+      createdAt:
+        type: string
+      creator:
+        $ref: '#/definitions/models.User'
+      creatorId:
+        type: string
+      participants:
+        items:
+          $ref: '#/definitions/models.Participant'
+        type: array
+      totalAmount:
+        type: integer
+    type: object
+  models.Item:
+    properties:
+      itemId:
+        type: string
+      name:
+        type: string
+      participantId:
+        type: string
+      price:
+        type: integer
+    type: object
+  models.Participant:
+    properties:
+      amountOwed:
+        type: integer
+      billId:
+        type: string
+      isPaid:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/models.Item'
+        type: array
+      participantId:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
   models.User:
     properties:
       userId:
@@ -42,6 +130,40 @@ paths:
       summary: Example confirm a payment
       tags:
       - Payment
+  /create-bill:
+    post:
+      consumes:
+      - application/json
+      description: Create a bill with participants and their items
+      parameters:
+      - description: Bill Info
+        in: body
+        name: bill
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateBillRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Bill'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new bill
+      tags:
+      - Bill
   /register:
     post:
       consumes:

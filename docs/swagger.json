@@ -53,6 +53,58 @@
                 }
             }
         },
+        "/create-bill": {
+            "post": {
+                "description": "Create a bill with participants and their items",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Create a new bill",
+                "parameters": [
+                    {
+                        "description": "Bill Info",
+                        "name": "bill",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CreateBillRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Bill"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/register": {
             "post": {
                 "description": "Save wallet address to database",
@@ -117,6 +169,137 @@
         }
     },
     "definitions": {
+        "dtos.CreateBillRequest": {
+            "type": "object",
+            "properties": {
+                "billTitle": {
+                    "type": "string",
+                    "example": "Dinner at Cafe"
+                },
+                "creatorId": {
+                    "type": "string",
+                    "example": "user123"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CreateParticipantRequest"
+                    }
+                },
+                "totalAmount": {
+                    "type": "integer",
+                    "example": 200000
+                }
+            }
+        },
+        "dtos.CreateItemRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Steak"
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 80000
+                }
+            }
+        },
+        "dtos.CreateParticipantRequest": {
+            "type": "object",
+            "properties": {
+                "amountOwed": {
+                    "type": "integer",
+                    "example": 100000
+                },
+                "isPaid": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CreateItemRequest"
+                    }
+                },
+                "participantId": {
+                    "type": "string",
+                    "example": "user123"
+                }
+            }
+        },
+        "models.Bill": {
+            "type": "object",
+            "properties": {
+                "billId": {
+                    "type": "string"
+                },
+                "billTitle": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "creatorId": {
+                    "type": "string"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Participant"
+                    }
+                },
+                "totalAmount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Item": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "participantId": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Participant": {
+            "type": "object",
+            "properties": {
+                "amountOwed": {
+                    "type": "integer"
+                },
+                "billId": {
+                    "type": "string"
+                },
+                "isPaid": {
+                    "type": "boolean"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Item"
+                    }
+                },
+                "participantId": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                }
+            }
+        },
         "models.User": {
             "type": "object",
             "properties": {

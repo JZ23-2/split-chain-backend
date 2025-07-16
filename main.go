@@ -40,5 +40,7 @@ func main() {
 
 	r.POST("api/v1/register", controllers.RegisterUser)
 
+	r.POST("api/v1/create-bill", controllers.CreateBill)
+
 	r.Run(":8080")
 }
