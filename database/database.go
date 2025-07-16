@@ -32,6 +32,8 @@ func ConnectDB() {
 
 	DB = db
 
-	// DB.Migrator().DropTable(&models.User{})
-	DB.AutoMigrate(&models.User{})
+	DB.Migrator().DropTable(&models.User{}, &models.Participant{}, &models.Item{})
+	db.AutoMigrate(
+		&models.User{}, &models.Bill{}, &models.Item{}, &models.Participant{},
+	)
 }
