@@ -7,6 +7,7 @@ import (
 	"github.com/JZ23-2/splitbill-backend/database"
 	"github.com/JZ23-2/splitbill-backend/dtos"
 	"github.com/JZ23-2/splitbill-backend/models"
+	"github.com/JZ23-2/splitbill-backend/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -18,14 +19,14 @@ import (
 // @Accept json
 // @Produce json
 // @Param bill body dtos.CreateBillRequest true "Bill Info"
-// @Success 201 {object} models.Bill
+// @Success 201 {object} dtos.CreateBillResponse
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /create-bill [post]
+// @Router /bills/create-bill [post]
 func CreateBill(c *gin.Context) {
 	var req dtos.CreateBillRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
+		utils.FailedResponse(c, http.StatusBadRequest, "invalid request")
 		return
 	}
 
@@ -59,9 +60,35 @@ func CreateBill(c *gin.Context) {
 	}
 
 	if err := database.DB.Create(&bill).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create bill"})
+		utils.FailedResponse(c, http.StatusInternalServerError, "failed to create bill")
 		return
 	}
 
-	c.JSON(http.StatusCreated, bill)
+	resp := dtos.CreateBillResponse{
+		BillID:      bill.BillID,
+		BillTitle:   bill.BillTitle,
+		TotalAmount: bill.TotalAmount,
+		CreatorID:   bill.CreatorID,
+		CreatedAt:   bill.CreatedAt.Format(time.RFC3339),
+	}
+
+	for _, p := range bill.Participants {
+		participantResp := dtos.CreateBillParticipantResponse{
+			ParticipantID: p.ParticipantID,
+			AmountOwed:    p.AmountOwed,
+			IsPaid:        p.IsPaid,
+		}
+
+		for _, item := range p.Items {
+			participantResp.Items = append(participantResp.Items, dtos.CreateBillItemResponse{
+				ItemID: item.ItemID,
+				Name:   item.Name,
+				Price:  item.Price,
+			})
+		}
+
+		resp.Participants = append(resp.Participants, participantResp)
+	}
+
+	utils.SuccessResponse(c, http.StatusCreated, "Bill created successfully", resp)
 }

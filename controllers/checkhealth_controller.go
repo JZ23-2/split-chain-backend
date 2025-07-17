@@ -1,6 +1,11 @@
 package controllers
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/JZ23-2/splitbill-backend/utils"
+	"github.com/gin-gonic/gin"
+)
 
 // CheckBackendHealth godoc
 // @Summary Check backend health
@@ -10,7 +15,5 @@ import "github.com/gin-gonic/gin"
 // @Success 200 {object} map[string]interface{}
 // @Router /check [get]
 func CheckHealth(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "Sehat Bro!",
-	})
+	utils.SuccessResponse(c, http.StatusOK, "Sehat Bro", "Sehat")
 }

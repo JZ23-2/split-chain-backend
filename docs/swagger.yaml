@@ -1,5 +1,27 @@
 basePath: /api/v1
 definitions:
+  dtos.CreateBillItemResponse:
+    properties:
+      itemId:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+    type: object
+  dtos.CreateBillParticipantResponse:
+    properties:
+      amountOwed:
+        type: integer
+      isPaid:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/dtos.CreateBillItemResponse'
+        type: array
+      participantId:
+        type: string
+    type: object
   dtos.CreateBillRequest:
     properties:
       billTitle:
@@ -14,6 +36,23 @@ definitions:
         type: array
       totalAmount:
         example: 200000
+        type: integer
+    type: object
+  dtos.CreateBillResponse:
+    properties:
+      billId:
+        type: string
+      billTitle:
+        type: string
+      createdAt:
+        type: string
+      creatorId:
+        type: string
+      participants:
+        items:
+          $ref: '#/definitions/dtos.CreateBillParticipantResponse'
+        type: array
+      totalAmount:
         type: integer
     type: object
   dtos.CreateItemRequest:
@@ -41,27 +80,37 @@ definitions:
         example: user123
         type: string
     type: object
-  models.Bill:
+  dtos.GetParticipantDetailRequest:
+    properties:
+      billId:
+        type: string
+      participantId:
+        type: string
+    required:
+    - billId
+    - participantId
+    type: object
+  dtos.ParticipantDetailResponse:
     properties:
       billId:
         type: string
       billTitle:
         type: string
-      createdAt:
-        type: string
-      creator:
-        $ref: '#/definitions/models.User'
       creatorId:
         type: string
-      participants:
+      items:
         items:
-          $ref: '#/definitions/models.Participant'
+          $ref: '#/definitions/models.Item'
         type: array
-      totalAmount:
+      participantId:
+        type: string
+      totalOwed:
         type: integer
     type: object
   models.Item:
     properties:
+      billId:
+        type: string
       itemId:
         type: string
       name:
@@ -71,28 +120,9 @@ definitions:
       price:
         type: integer
     type: object
-  models.Participant:
-    properties:
-      amountOwed:
-        type: integer
-      billId:
-        type: string
-      isPaid:
-        type: boolean
-      items:
-        items:
-          $ref: '#/definitions/models.Item'
-        type: array
-      participantId:
-        type: string
-      user:
-        $ref: '#/definitions/models.User'
-    type: object
   models.User:
     properties:
-      userId:
-        type: string
-      wallet:
+      wallet_address:
         type: string
     type: object
 info:
@@ -102,6 +132,40 @@ info:
     name: MIT
   version: "1.0"
 paths:
+  /bills/create-bill:
+    post:
+      consumes:
+      - application/json
+      description: Create a bill with participants and their items
+      parameters:
+      - description: Bill Info
+        in: body
+        name: bill
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateBillRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.CreateBillResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new bill
+      tags:
+      - Bill
   /check:
     get:
       description: Check backend health
@@ -130,41 +194,69 @@ paths:
       summary: Example confirm a payment
       tags:
       - Payment
-  /create-bill:
-    post:
+  /participants/get-all-participant-detail/{participantId}:
+    get:
       consumes:
       - application/json
-      description: Create a bill with participants and their items
+      description: Get participant all bills
       parameters:
-      - description: Bill Info
-        in: body
-        name: bill
+      - description: Participant ID
+        in: path
+        name: participantId
         required: true
-        schema:
-          $ref: '#/definitions/dtos.CreateBillRequest'
+        type: string
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
-            $ref: '#/definitions/models.Bill'
+            $ref: '#/definitions/dtos.ParticipantDetailResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get participant Bills
+      tags:
+      - Participants
+  /participants/get-participant-detail:
+    post:
+      consumes:
+      - application/json
+      description: Retrieve participant detail including bill and items using billId
+        and participantId
+      parameters:
+      - description: Bill and Participant IDs
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.GetParticipantDetailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.ParticipantDetailResponse'
         "400":
           description: Bad Request
           schema:
             additionalProperties:
               type: string
             type: object
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Not Found
           schema:
             additionalProperties:
               type: string
             type: object
-      summary: Create a new bill
+      summary: Get participant detail in a bill
       tags:
-      - Bill
-  /register:
+      - Participant
+  /users/register:
     post:
       consumes:
       - application/json

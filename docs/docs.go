@@ -20,6 +20,58 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/bills/create-bill": {
+            "post": {
+                "description": "Create a bill with participants and their items",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Create a new bill",
+                "parameters": [
+                    {
+                        "description": "Bill Info",
+                        "name": "bill",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CreateBillRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CreateBillResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/check": {
             "get": {
                 "description": "Check backend health",
@@ -62,9 +114,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/create-bill": {
-            "post": {
-                "description": "Create a bill with participants and their items",
+        "/participants/get-all-participant-detail/{participantId}": {
+            "get": {
+                "description": "Get participant all bills",
                 "consumes": [
                     "application/json"
                 ],
@@ -72,25 +124,66 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Bill"
+                    "Participants"
                 ],
-                "summary": "Create a new bill",
+                "summary": "Get participant Bills",
                 "parameters": [
                     {
-                        "description": "Bill Info",
-                        "name": "bill",
+                        "type": "string",
+                        "description": "Participant ID",
+                        "name": "participantId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ParticipantDetailResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/participants/get-participant-detail": {
+            "post": {
+                "description": "Retrieve participant detail including bill and items using billId and participantId",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Participant"
+                ],
+                "summary": "Get participant detail in a bill",
+                "parameters": [
+                    {
+                        "description": "Bill and Participant IDs",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.CreateBillRequest"
+                            "$ref": "#/definitions/dtos.GetParticipantDetailRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Bill"
+                            "$ref": "#/definitions/dtos.ParticipantDetailResponse"
                         }
                     },
                     "400": {
@@ -102,8 +195,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -114,7 +207,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/register": {
+        "/users/register": {
             "post": {
                 "description": "Save wallet address to database",
                 "consumes": [
@@ -178,6 +271,40 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dtos.CreateBillItemResponse": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.CreateBillParticipantResponse": {
+            "type": "object",
+            "properties": {
+                "amountOwed": {
+                    "type": "integer"
+                },
+                "isPaid": {
+                    "type": "boolean"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CreateBillItemResponse"
+                    }
+                },
+                "participantId": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.CreateBillRequest": {
             "type": "object",
             "properties": {
@@ -198,6 +325,32 @@ const docTemplate = `{
                 "totalAmount": {
                     "type": "integer",
                     "example": 200000
+                }
+            }
+        },
+        "dtos.CreateBillResponse": {
+            "type": "object",
+            "properties": {
+                "billId": {
+                    "type": "string"
+                },
+                "billTitle": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "creatorId": {
+                    "type": "string"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CreateBillParticipantResponse"
+                    }
+                },
+                "totalAmount": {
+                    "type": "integer"
                 }
             }
         },
@@ -237,7 +390,22 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Bill": {
+        "dtos.GetParticipantDetailRequest": {
+            "type": "object",
+            "required": [
+                "billId",
+                "participantId"
+            ],
+            "properties": {
+                "billId": {
+                    "type": "string"
+                },
+                "participantId": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.ParticipantDetailResponse": {
             "type": "object",
             "properties": {
                 "billId": {
@@ -246,22 +414,19 @@ const docTemplate = `{
                 "billTitle": {
                     "type": "string"
                 },
-                "createdAt": {
-                    "type": "string"
-                },
-                "creator": {
-                    "$ref": "#/definitions/models.User"
-                },
                 "creatorId": {
                     "type": "string"
                 },
-                "participants": {
+                "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Participant"
+                        "$ref": "#/definitions/models.Item"
                     }
                 },
-                "totalAmount": {
+                "participantId": {
+                    "type": "string"
+                },
+                "totalOwed": {
                     "type": "integer"
                 }
             }
@@ -269,6 +434,9 @@ const docTemplate = `{
         "models.Item": {
             "type": "object",
             "properties": {
+                "billId": {
+                    "type": "string"
+                },
                 "itemId": {
                     "type": "string"
                 },
@@ -283,39 +451,10 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Participant": {
-            "type": "object",
-            "properties": {
-                "amountOwed": {
-                    "type": "integer"
-                },
-                "billId": {
-                    "type": "string"
-                },
-                "isPaid": {
-                    "type": "boolean"
-                },
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Item"
-                    }
-                },
-                "participantId": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/models.User"
-                }
-            }
-        },
         "models.User": {
             "type": "object",
             "properties": {
-                "userId": {
-                    "type": "string"
-                },
-                "wallet": {
+                "wallet_address": {
                     "type": "string"
                 }
             }

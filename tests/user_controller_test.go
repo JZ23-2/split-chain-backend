@@ -47,9 +47,10 @@ func setupTestDB() {
 	dbUser := getEnvOrDefault("DB_USER", "root")
 	dbPass := getEnvOrDefault("DB_PASS", "")
 	dbHost := getEnvOrDefault("DB_HOST", "127.0.0.1:3306")
+	dbName := getEnvOrDefault("DB_NAME", "")
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		dbUser, dbPass, dbHost, "SplitChain_Test")
+		dbUser, dbPass, dbHost, dbName)
 
 	fmt.Println(dsn)
 

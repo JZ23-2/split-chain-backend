@@ -34,13 +34,31 @@ func main() {
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r.GET("api/v1/check", controllers.CheckHealth)
+	api := r.Group("/api/v1")
+	{
 
-	r.GET("api/v1/confirm-payment", controllers.ConfirmTransaction)
+		r.GET("api/v1/check", controllers.CheckHealth)
+		r.GET("api/v1/confirm-payment", controllers.ConfirmTransaction)
 
-	r.POST("api/v1/register", controllers.RegisterUser)
+		user := api.Group("/users")
+		{
+			user.POST("/register", controllers.RegisterUser)
+		}
 
-	r.POST("api/v1/create-bill", controllers.CreateBill)
+		participant := api.Group("/participants")
+		{
+			participant.GET("/get-all-participant-detail/:participantId", controllers.GetParticipantBills)
+
+			participant.POST("/get-participant-detail", controllers.GetParticipantDetail)
+		}
+
+		bill := api.Group("/bills")
+		{
+			bill.POST("/create-bill", controllers.CreateBill)
+		}
+
+	}
 
 	r.Run(":8080")
+
 }
