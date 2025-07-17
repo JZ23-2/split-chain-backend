@@ -32,7 +32,7 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	var existing models.User
-	err := database.DB.Where("walletAddress = ?", input.WalletAddress).First(&existing).Error
+	err := database.DB.Where("wallet_address = ?", input.WalletAddress).First(&existing).Error
 	if err == nil {
 		utils.FailedResponse(c, http.StatusConflict, "Wallet already registered")
 		return
