@@ -6,8 +6,8 @@ import (
 
 	"github.com/JZ23-2/splitbill-backend/database"
 	"github.com/JZ23-2/splitbill-backend/models"
+	"github.com/JZ23-2/splitbill-backend/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -27,34 +27,24 @@ func RegisterUser(c *gin.Context) {
 	var input models.User
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		utils.FailedResponse(c, http.StatusBadRequest, "Invalid Input")
 		return
 	}
-
-	if input.Wallet == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Wallet is required"})
-		return
-	}
-
-	input.UserID = uuid.New().String()
 
 	var existing models.User
-	err := database.DB.Where("wallet = ?", input.Wallet).First(&existing).Error
+	err := database.DB.Where("wallet_address = ?", input.WalletAddress).First(&existing).Error
 	if err == nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "Wallet already registered"})
+		utils.FailedResponse(c, http.StatusConflict, "Wallet already registered")
 		return
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		utils.FailedResponse(c, http.StatusInternalServerError, "Database error")
 		return
 	}
 
 	if err := database.DB.Create(&input).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
+		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to register user")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "User registered successfully",
-		"user":    input,
-	})
+	utils.SuccessResponse(c, http.StatusOK, "User registered successfully", input)
 }
