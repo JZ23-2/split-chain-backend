@@ -207,6 +207,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/receipt/": {
+            "post": {
+                "description": "Accepts a receipt image (PNG/JPEG) and get the detail.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "receipt"
+                ],
+                "summary": "Extract structured receipt data from an uploaded image",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Receipt image file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Structured receipt result.",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ReceiptResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input (missing file, bad form data)."
+                    },
+                    "500": {
+                        "description": "Internal error (Gemini failure, parse error, etc.)."
+                    }
+                }
+            }
+        },
         "/users": {
             "post": {
                 "description": "Save wallet address to database",
@@ -428,6 +466,49 @@ const docTemplate = `{
                 },
                 "totalOwed": {
                     "type": "integer"
+                }
+            }
+        },
+        "dtos.ReceiptItem": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "priceAfterTax": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "number"
+                },
+                "totalPrice": {
+                    "type": "number"
+                },
+                "unitPrice": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.ReceiptResponse": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.ReceiptItem"
+                    }
+                },
+                "storeName": {
+                    "type": "string"
+                },
+                "tax": {
+                    "type": "number"
+                },
+                "totalAmount": {
+                    "type": "number"
                 }
             }
         },

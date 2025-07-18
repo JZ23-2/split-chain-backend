@@ -107,6 +107,34 @@ definitions:
       totalOwed:
         type: integer
     type: object
+  dtos.ReceiptItem:
+    properties:
+      name:
+        type: string
+      priceAfterTax:
+        type: number
+      quantity:
+        type: number
+      totalPrice:
+        type: number
+      unitPrice:
+        type: number
+    type: object
+  dtos.ReceiptResponse:
+    properties:
+      date:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dtos.ReceiptItem'
+        type: array
+      storeName:
+        type: string
+      tax:
+        type: number
+      totalAmount:
+        type: number
+    type: object
   models.Item:
     properties:
       billId:
@@ -256,6 +284,31 @@ paths:
       summary: Get participant detail in a bill
       tags:
       - Participant
+  /receipt/:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Accepts a receipt image (PNG/JPEG) and get the detail.
+      parameters:
+      - description: Receipt image file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Structured receipt result.
+          schema:
+            $ref: '#/definitions/dtos.ReceiptResponse'
+        "400":
+          description: Invalid input (missing file, bad form data).
+        "500":
+          description: Internal error (Gemini failure, parse error, etc.).
+      summary: Extract structured receipt data from an uploaded image
+      tags:
+      - receipt
   /users:
     post:
       consumes:

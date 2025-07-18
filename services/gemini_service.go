@@ -35,14 +35,14 @@ func SendToGemini(file io.Reader) (*dtos.ReceiptResponse, error) {
 					{
 						InlineData: &dtos.InlineData{
 							MimeType: "image/png",
-							Data: base64Image,
+							Data:     base64Image,
 						},
 					},
 				},
 			},
 		},
 	}
-	
+
 	body, _ := json.Marshal(payload)
 
 	apiURL := os.Getenv("GEMINI_API_URL") + "?key=" + os.Getenv("GEMINI_API_KEY")
@@ -69,8 +69,6 @@ func SendToGemini(file io.Reader) (*dtos.ReceiptResponse, error) {
 
 	jsonText := geminiRes.Candidates[0].Content.Parts[0].Text
 
-	fmt.Println("Raw Gemini JSON text:\n", jsonText)
-
 	jsonText = strings.TrimSpace(jsonText)
 	if strings.HasPrefix(jsonText, "```") {
 		jsonText = strings.TrimPrefix(jsonText, "```json")
@@ -78,7 +76,7 @@ func SendToGemini(file io.Reader) (*dtos.ReceiptResponse, error) {
 		jsonText = strings.TrimSuffix(jsonText, "```")
 		jsonText = strings.TrimSpace(jsonText)
 	}
-	
+
 	var receipt dtos.ReceiptResponse
 	if err := json.Unmarshal([]byte(jsonText), &receipt); err != nil {
 		return nil, fmt.Errorf("failed to parse JSON from gemini response: %v", err)
