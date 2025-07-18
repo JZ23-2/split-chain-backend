@@ -131,7 +131,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Participant ID",
-                        "name": "participantId",
+                        "name": "participant_id",
                         "in": "path",
                         "required": true
                     }

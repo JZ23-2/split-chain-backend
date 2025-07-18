@@ -202,7 +202,7 @@ paths:
       parameters:
       - description: Participant ID
         in: path
-        name: participantId
+        name: participant_id
         required: true
         type: string
       produces:

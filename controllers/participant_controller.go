@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/JZ23-2/splitbill-backend/database"
@@ -17,22 +16,19 @@ import (
 // @Tags Participants
 // @Accept  json
 // @Produce  json
-// @Param participantId path string true "Participant ID"
+// @Param participant_id path string true "Participant ID"
 // @Success 200 {object} dtos.ParticipantDetailResponse
 // @Failure 404 {object} map[string]string
 // @Router /participants/{participant_id} [get]
 func GetParticipantBills(c *gin.Context) {
 	participantId := c.Param("participant_id")
-
 	var participants []models.Participant
 
 	err := database.DB.
-		Where("participant_id = ?", participantId).
+		Where("participant_id = ?", &participantId).
 		Preload("Bill").
 		Preload("Items").
 		Find(&participants).Error
-
-	fmt.Println("testing", participants)
 
 	if err != nil {
 		utils.FailedResponse(c, http.StatusInternalServerError, "DB error")
