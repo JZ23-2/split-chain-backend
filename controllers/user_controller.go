@@ -22,7 +22,7 @@ import (
 // @Failure      400  {object}  map[string]string
 // @Failure      409  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
-// @Router       /users/register [post]
+// @Router       /users [post]
 func RegisterUser(c *gin.Context) {
 	var input models.User
 

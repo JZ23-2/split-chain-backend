@@ -22,7 +22,7 @@ import (
 // @Success 201 {object} dtos.CreateBillResponse
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /bills/create-bill [post]
+// @Router /bills [post]
 func CreateBill(c *gin.Context) {
 	var req dtos.CreateBillRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

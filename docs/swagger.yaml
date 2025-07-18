@@ -132,7 +132,7 @@ info:
     name: MIT
   version: "1.0"
 paths:
-  /bills/create-bill:
+  /bills:
     post:
       consumes:
       - application/json
@@ -194,7 +194,7 @@ paths:
       summary: Example confirm a payment
       tags:
       - Payment
-  /participants/get-all-participant-detail/{participantId}:
+  /participants/{participant_id}:
     get:
       consumes:
       - application/json
@@ -221,8 +221,8 @@ paths:
       summary: Get participant Bills
       tags:
       - Participants
-  /participants/get-participant-detail:
-    post:
+  /participants/{participant_id}/{bill_id}:
+    get:
       consumes:
       - application/json
       description: Retrieve participant detail including bill and items using billId
@@ -256,7 +256,7 @@ paths:
       summary: Get participant detail in a bill
       tags:
       - Participant
-  /users/register:
+  /users:
     post:
       consumes:
       - application/json

@@ -20,7 +20,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/bills/create-bill": {
+        "/bills": {
             "post": {
                 "description": "Create a bill with participants and their items",
                 "consumes": [
@@ -114,7 +114,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/participants/get-all-participant-detail/{participantId}": {
+        "/participants/{participant_id}": {
             "get": {
                 "description": "Get participant all bills",
                 "consumes": [
@@ -155,8 +155,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/participants/get-participant-detail": {
-            "post": {
+        "/participants/{participant_id}/{bill_id}": {
+            "get": {
                 "description": "Retrieve participant detail including bill and items using billId and participantId",
                 "consumes": [
                     "application/json"
@@ -207,7 +207,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/register": {
+        "/users": {
             "post": {
                 "description": "Save wallet address to database",
                 "consumes": [

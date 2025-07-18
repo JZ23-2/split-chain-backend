@@ -11,7 +11,7 @@
     },
     "basePath": "/api/v1",
     "paths": {
-        "/bills/create-bill": {
+        "/bills": {
             "post": {
                 "description": "Create a bill with participants and their items",
                 "consumes": [
@@ -105,7 +105,7 @@
                 }
             }
         },
-        "/participants/get-all-participant-detail/{participantId}": {
+        "/participants/{participant_id}": {
             "get": {
                 "description": "Get participant all bills",
                 "consumes": [
@@ -146,8 +146,8 @@
                 }
             }
         },
-        "/participants/get-participant-detail": {
-            "post": {
+        "/participants/{participant_id}/{bill_id}": {
+            "get": {
                 "description": "Retrieve participant detail including bill and items using billId and participantId",
                 "consumes": [
                     "application/json"
@@ -198,7 +198,7 @@
                 }
             }
         },
-        "/users/register": {
+        "/users": {
             "post": {
                 "description": "Save wallet address to database",
                 "consumes": [

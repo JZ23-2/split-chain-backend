@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/JZ23-2/splitbill-backend/database"
@@ -19,9 +20,9 @@ import (
 // @Param participantId path string true "Participant ID"
 // @Success 200 {object} dtos.ParticipantDetailResponse
 // @Failure 404 {object} map[string]string
-// @Router /participants/get-all-participant-detail/{participantId} [get]
+// @Router /participants/{participant_id} [get]
 func GetParticipantBills(c *gin.Context) {
-	participantId := c.Param("participantId")
+	participantId := c.Param("participant_id")
 
 	var participants []models.Participant
 
@@ -30,6 +31,9 @@ func GetParticipantBills(c *gin.Context) {
 		Preload("Bill").
 		Preload("Items").
 		Find(&participants).Error
+
+	fmt.Println("testing", participants)
+
 	if err != nil {
 		utils.FailedResponse(c, http.StatusInternalServerError, "DB error")
 		return
@@ -66,21 +70,18 @@ func GetParticipantBills(c *gin.Context) {
 // @Success 200 {object} dtos.ParticipantDetailResponse
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
-// @Router /participants/get-participant-detail [post]
+// @Router /participants/{participant_id}/{bill_id} [get]
 func GetParticipantDetail(c *gin.Context) {
-	var req dtos.GetParticipantDetailRequest
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.FailedResponse(c, http.StatusBadRequest, "Invalid Request")
-		return
-	}
+	participantId := c.Param("participant_id")
+	billId := c.Param("bill_id")
 
 	var participant models.Participant
 	err := database.DB.
-		Where("bill_id = ? AND participant_id = ?", req.BillID, req.ParticipantID).
+		Where("bill_id = ? AND participant_id = ?", billId, participantId).
 		Preload("Bill").
-		Preload("Items", "bill_id = ? AND participant_id = ?", req.BillID, req.ParticipantID).
+		Preload("Items", "bill_id = ? AND participant_id = ?", billId, participantId).
 		First(&participant).Error
+
 	if err != nil {
 		utils.FailedResponse(c, http.StatusNotFound, "Participant Not Found")
 		return
