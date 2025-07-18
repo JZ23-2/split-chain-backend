@@ -1,0 +1,16 @@
+Extract structured info from this receipt image and return JSON only in this format:
+{
+  "storeName": string,
+  "date": "YYYY-MM-DD",
+  "items": [
+    {
+      "name": string,
+      "quantity": int,
+      "unitPrice": float,
+      "totalPrice": float
+    }
+  ],
+  "tax": float,
+  "totalAmount": float
+}
+Only respond with JSON. Use null if any value is unclear.
