@@ -114,6 +114,96 @@ const docTemplate = `{
                 }
             }
         },
+        "/friend/accept-friend": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Friend"
+                ],
+                "summary": "Accept friend request",
+                "parameters": [
+                    {
+                        "description": "Friend Info",
+                        "name": "friend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.AcceptFriendRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.AcceptFriendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Request"
+                    },
+                    "404": {
+                        "description": "User or Friend Not Found"
+                    },
+                    "409": {
+                        "description": "Relationship Already Exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/friend/decline-friend": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Friend"
+                ],
+                "summary": "Decline friend request",
+                "parameters": [
+                    {
+                        "description": "Friend Info",
+                        "name": "friend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.DeclineFriendRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.DeclineFriendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Request"
+                    },
+                    "404": {
+                        "description": "User or Friend Not Found"
+                    },
+                    "409": {
+                        "description": "Relationship Already Exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/participants/{participant_id}": {
             "get": {
                 "description": "Get participant all bills",
@@ -203,6 +293,51 @@ const docTemplate = `{
                                 "type": "string"
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/pending-friend-request/send-request": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pending Friend Request"
+                ],
+                "summary": "Create friend request",
+                "parameters": [
+                    {
+                        "description": "Friend Info",
+                        "name": "friend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.AddFriendRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.AddFriendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Request"
+                    },
+                    "404": {
+                        "description": "User or Friend Not Found"
+                    },
+                    "409": {
+                        "description": "Relationship Already Exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -349,6 +484,78 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dtos.AcceptFriendRequest": {
+            "type": "object",
+            "required": [
+                "friend_wallet_address",
+                "id",
+                "user_wallet_address"
+            ],
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "user_wallet_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.AcceptFriendResponse": {
+            "type": "object",
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "user_wallet_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.AddFriendRequest": {
+            "type": "object",
+            "required": [
+                "friend_wallet_address",
+                "user_wallet_address"
+            ],
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "user_wallet_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.AddFriendResponse": {
+            "type": "object",
+            "required": [
+                "friend_wallet_address",
+                "user_wallet_address"
+            ],
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "user_wallet_address": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.CreateBillItemResponse": {
             "type": "object",
             "properties": {
@@ -465,6 +672,42 @@ const docTemplate = `{
                 "participantId": {
                     "type": "string",
                     "example": "user123"
+                }
+            }
+        },
+        "dtos.DeclineFriendRequest": {
+            "type": "object",
+            "required": [
+                "friend_wallet_address",
+                "user_wallet_address"
+            ],
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "user_wallet_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.DeclineFriendResponse": {
+            "type": "object",
+            "required": [
+                "friend_wallet_address",
+                "user_wallet_address"
+            ],
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "user_wallet_address": {
+                    "type": "string"
                 }
             }
         },

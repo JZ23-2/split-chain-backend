@@ -1,5 +1,53 @@
 basePath: /api/v1
 definitions:
+  dtos.AcceptFriendRequest:
+    properties:
+      friend_wallet_address:
+        type: string
+      id:
+        type: string
+      user_wallet_address:
+        type: string
+    required:
+    - friend_wallet_address
+    - id
+    - user_wallet_address
+    type: object
+  dtos.AcceptFriendResponse:
+    properties:
+      friend_wallet_address:
+        type: string
+      id:
+        type: string
+      nickname:
+        type: string
+      user_wallet_address:
+        type: string
+    type: object
+  dtos.AddFriendRequest:
+    properties:
+      friend_wallet_address:
+        type: string
+      user_wallet_address:
+        type: string
+    required:
+    - friend_wallet_address
+    - user_wallet_address
+    type: object
+  dtos.AddFriendResponse:
+    properties:
+      friend_wallet_address:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+      user_wallet_address:
+        type: string
+    required:
+    - friend_wallet_address
+    - user_wallet_address
+    type: object
   dtos.CreateBillItemResponse:
     properties:
       itemId:
@@ -79,6 +127,30 @@ definitions:
       participantId:
         example: user123
         type: string
+    type: object
+  dtos.DeclineFriendRequest:
+    properties:
+      friend_wallet_address:
+        type: string
+      user_wallet_address:
+        type: string
+    required:
+    - friend_wallet_address
+    - user_wallet_address
+    type: object
+  dtos.DeclineFriendResponse:
+    properties:
+      friend_wallet_address:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+      user_wallet_address:
+        type: string
+    required:
+    - friend_wallet_address
+    - user_wallet_address
     type: object
   dtos.GetParticipantDetailRequest:
     properties:
@@ -234,6 +306,64 @@ paths:
       summary: Example confirm a payment
       tags:
       - Payment
+  /friend/accept-friend:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Friend Info
+        in: body
+        name: friend
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.AcceptFriendRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.AcceptFriendResponse'
+        "400":
+          description: Invalid Request
+        "404":
+          description: User or Friend Not Found
+        "409":
+          description: Relationship Already Exists
+        "500":
+          description: Internal Server Error
+      summary: Accept friend request
+      tags:
+      - Friend
+  /friend/decline-friend:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Friend Info
+        in: body
+        name: friend
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.DeclineFriendRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.DeclineFriendResponse'
+        "400":
+          description: Invalid Request
+        "404":
+          description: User or Friend Not Found
+        "409":
+          description: Relationship Already Exists
+        "500":
+          description: Internal Server Error
+      summary: Decline friend request
+      tags:
+      - Friend
   /participants/{participant_id}:
     get:
       consumes:
@@ -296,6 +426,35 @@ paths:
       summary: Get participant detail in a bill
       tags:
       - Participant
+  /pending-friend-request/send-request:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Friend Info
+        in: body
+        name: friend
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.AddFriendRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.AddFriendResponse'
+        "400":
+          description: Invalid Request
+        "404":
+          description: User or Friend Not Found
+        "409":
+          description: Relationship Already Exists
+        "500":
+          description: Internal Server Error
+      summary: Create friend request
+      tags:
+      - Pending Friend Request
   /rate:
     post:
       consumes:

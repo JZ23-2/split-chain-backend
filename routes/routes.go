@@ -34,6 +34,8 @@ func SetUpRoutes() {
 		BillRoutes(api)
 		ReceiptRoute(api)
 		ExchangeRateRoute(api)
+		PendingFriendRoutes(api)
+		FriendRoutes(api)
 	}
 
 	r.Run(":8080")
