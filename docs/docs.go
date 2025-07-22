@@ -207,6 +207,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/rate": {
+            "post": {
+                "description": "Takes a receipt JSON, converts each item's price (after tax) to HBAR using the current rate, and returns the updated receipt.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rate Conversion"
+                ],
+                "summary": "Convert item prices to HBAR",
+                "parameters": [
+                    {
+                        "description": "Receipt data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ReceiptResponse"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ReceiptResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to fetch HBAR rate"
+                    }
+                }
+            }
+        },
         "/receipt/": {
             "post": {
                 "description": "Accepts a receipt image (PNG/JPEG) and get the detail.",
@@ -473,19 +513,28 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Front and rear brake cables"
                 },
                 "priceAfterTax": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 105.88083
+                },
+                "priceInHBAR": {
+                    "type": "number",
+                    "example": 0
                 },
                 "quantity": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 1
                 },
                 "totalPrice": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 100
                 },
                 "unitPrice": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 100
                 }
             }
         },
@@ -493,7 +542,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "date": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2025-10-02"
                 },
                 "items": {
                     "type": "array",
@@ -502,13 +552,16 @@ const docTemplate = `{
                     }
                 },
                 "storeName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Nigger Store"
                 },
                 "tax": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 9.1
                 },
                 "totalAmount": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 15.4
                 }
             }
         },
