@@ -6,9 +6,10 @@ import (
 )
 
 func FriendRoutes(api *gin.RouterGroup) {
-	friend := api.Group("/friend")
+	friend := api.Group("/friends")
 	{
-		friend.POST("/accept-friend", controllers.AcceptFriendRequest)
-		friend.POST("/decline-friend", controllers.DeclineFriendRequest)
+		friend.POST("/accept", controllers.AcceptFriendRequest)
+		friend.POST("/decline", controllers.DeclineFriendRequest)
+		friend.POST("/add", controllers.AddFriend)
 	}
 }
