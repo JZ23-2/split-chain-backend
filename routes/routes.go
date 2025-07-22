@@ -32,7 +32,8 @@ func SetUpRoutes() {
 		fmt.Println("logging here")
 		ParticipantRoutes(api)
 		BillRoutes(api)
-		ReceiptRoutes(api)
+		ReceiptRoute(api)
+		ExchangeRateRoute(api)
 	}
 
 	r.Run(":8080")

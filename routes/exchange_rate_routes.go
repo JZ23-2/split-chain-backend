@@ -5,6 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ReceiptRoute(api *gin.RouterGroup) {
-	api.POST("/receipt", controllers.ExtractReceipt)
+func ExchangeRateRoute(api *gin.RouterGroup) {
+	api.POST("/rate", controllers.ConvertPricesToHBAR)
 }

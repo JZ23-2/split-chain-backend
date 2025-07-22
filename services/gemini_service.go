@@ -88,6 +88,7 @@ func SendToGemini(file io.Reader) (*dtos.ReceiptResponse, error) {
 		proportion := receipt.Items[i].TotalPrice / sumTotal
 		taxProportion := proportion * receipt.Tax
 		receipt.Items[i].PriceAfterTax = receipt.Items[i].TotalPrice + taxProportion
+		receipt.Items[i].PriceInHBAR = 0
 	}
 
 	return &receipt, nil

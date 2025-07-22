@@ -6,6 +6,7 @@ type ReceiptItem struct {
 	UnitPrice     float32 `json:"unitPrice"`
 	TotalPrice    float32 `json:"totalPrice"`
 	PriceAfterTax float32 `json:"priceAfterTax"`
+	PriceInHBAR   float32 `json:"priceInHBAR"`
 }
 
 type ReceiptResponse struct {
