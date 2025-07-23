@@ -204,6 +204,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/friends/alias": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Friend"
+                ],
+                "summary": "add friend nickname",
+                "parameters": [
+                    {
+                        "description": "Friend Info",
+                        "name": "friend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.FriendNicknameRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.FriendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Request"
+                    },
+                    "404": {
+                        "description": "User or Friend Not Found"
+                    },
+                    "409": {
+                        "description": "Relationship Already Exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/friends/decline": {
             "post": {
                 "consumes": [
@@ -232,6 +277,49 @@ const docTemplate = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/dtos.DeclineFriendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Request"
+                    },
+                    "404": {
+                        "description": "User or Friend Not Found"
+                    },
+                    "409": {
+                        "description": "Relationship Already Exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/friends/{user_wallet_address}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Friend"
+                ],
+                "summary": "Fetch friend",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Wallet Address",
+                        "name": "user_wallet_address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.FriendResponse"
                         }
                     },
                     "400": {
@@ -695,6 +783,39 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_wallet_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.FriendNicknameRequest": {
+            "type": "object",
+            "required": [
+                "friend_wallet_address",
+                "nickname",
+                "user_wallet_address"
+            ],
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "user_wallet_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.FriendResponse": {
+            "type": "object",
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nickname": {
                     "type": "string"
                 }
             }
