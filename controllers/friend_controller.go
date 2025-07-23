@@ -172,8 +172,12 @@ func AddFriend(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Where("user_wallet_address = ? AND friend_wallet_address = ?", req.UserWalletAddress, req.FriendWalletAddress).First(&existing).Error; err == nil {
-		utils.FailedResponse(c, http.StatusConflict, "Friend Request Already Send")
+	if err := database.DB.Where(
+		"(user_wallet_address = ? AND friend_wallet_address = ?) OR (user_wallet_address = ? AND friend_wallet_address = ?)",
+		req.UserWalletAddress, req.FriendWalletAddress,
+		req.FriendWalletAddress, req.UserWalletAddress,
+	).First(&existing).Error; err == nil {
+		utils.FailedResponse(c, http.StatusConflict, "Friend request already exists (in either direction)")
 		return
 	}
 
