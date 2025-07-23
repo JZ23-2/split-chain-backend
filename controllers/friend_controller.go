@@ -203,9 +203,39 @@ func AddFriend(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Successfully Added Friend Request", response)
 }
 
-// TODO: Fetch Friend for user
-// Routes: /friend/{user_id}
-// Return: Friend array
+// FetchFriend godoc
+//
+//	@Summary	Fetch friend
+//
+// Description Fetch user friend
+//
+//	@Tags		Friend
+//	@Accept		json
+//	@Produce	json
+//	@Success	201		{object}	dtos.GetFriendResponse
+//	@Param			user_wallet_address	path		string	true	"User Wallet Address"
+//	@Failure	400		"Invalid Request"
+//	@Failure	404		"User or Friend Not Found"
+//	@Failure	409		"Relationship Already Exists"
+//	@Failure	500		"Internal Server Error"
+//	@Router		/friends/{user_wallet_address} [get]
+func GetFriend(c *gin.Context) {
+	userWalletAddress := c.Param("user_wallet_address")
+	var friends []dtos.GetFriendResponse
+
+	err := database.DB.
+		Table("friends").
+		Select("id, nickname, friend_wallet_address").
+		Where("user_wallet_address = ?", userWalletAddress).
+		Find(&friends).Error
+
+	if err != nil {
+		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to fetch friends")
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Successfully Fetch Friend", friends)
+}
 
 // TODO: Add alias for friend
 // Routes: /friend/alias/{user_id}/{friend_id}

@@ -240,6 +240,49 @@
                 }
             }
         },
+        "/friends/{user_wallet_address}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Friend"
+                ],
+                "summary": "Fetch friend",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Wallet Address",
+                        "name": "user_wallet_address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetFriendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Request"
+                    },
+                    "404": {
+                        "description": "User or Friend Not Found"
+                    },
+                    "409": {
+                        "description": "Relationship Already Exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/participants/{participant_id}": {
             "get": {
                 "description": "Get participant all bills",
@@ -686,6 +729,20 @@
                     "type": "string"
                 },
                 "user_wallet_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.GetFriendResponse": {
+            "type": "object",
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "nickname": {
                     "type": "string"
                 }
             }

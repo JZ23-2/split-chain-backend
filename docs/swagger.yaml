@@ -143,6 +143,15 @@ definitions:
     - friend_wallet_address
     - user_wallet_address
     type: object
+  dtos.GetFriendResponse:
+    properties:
+      friend_wallet_address:
+        type: string
+      id:
+        type: string
+      nickname:
+        type: string
+    type: object
   dtos.GetParticipantDetailRequest:
     properties:
       billId:
@@ -297,6 +306,34 @@ paths:
       summary: Example confirm a payment
       tags:
       - Payment
+  /friends/{user_wallet_address}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: User Wallet Address
+        in: path
+        name: user_wallet_address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.GetFriendResponse'
+        "400":
+          description: Invalid Request
+        "404":
+          description: User or Friend Not Found
+        "409":
+          description: Relationship Already Exists
+        "500":
+          description: Internal Server Error
+      summary: Fetch friend
+      tags:
+      - Friend
   /friends/accept:
     post:
       consumes:
