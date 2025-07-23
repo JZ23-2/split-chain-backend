@@ -204,6 +204,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/friends/alias": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Friend"
+                ],
+                "summary": "add friend nickname",
+                "parameters": [
+                    {
+                        "description": "Friend Info",
+                        "name": "friend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.FriendNicknameRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.FriendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Request"
+                    },
+                    "404": {
+                        "description": "User or Friend Not Found"
+                    },
+                    "409": {
+                        "description": "Relationship Already Exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/friends/decline": {
             "post": {
                 "consumes": [
@@ -274,7 +319,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dtos.GetFriendResponse"
+                            "$ref": "#/definitions/dtos.FriendResponse"
                         }
                     },
                     "400": {
@@ -742,7 +787,26 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.GetFriendResponse": {
+        "dtos.FriendNicknameRequest": {
+            "type": "object",
+            "required": [
+                "friend_wallet_address",
+                "nickname",
+                "user_wallet_address"
+            ],
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "user_wallet_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.FriendResponse": {
             "type": "object",
             "properties": {
                 "friend_wallet_address": {

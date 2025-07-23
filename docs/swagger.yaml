@@ -143,7 +143,20 @@ definitions:
     - friend_wallet_address
     - user_wallet_address
     type: object
-  dtos.GetFriendResponse:
+  dtos.FriendNicknameRequest:
+    properties:
+      friend_wallet_address:
+        type: string
+      nickname:
+        type: string
+      user_wallet_address:
+        type: string
+    required:
+    - friend_wallet_address
+    - nickname
+    - user_wallet_address
+    type: object
+  dtos.FriendResponse:
     properties:
       friend_wallet_address:
         type: string
@@ -322,7 +335,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/dtos.GetFriendResponse'
+            $ref: '#/definitions/dtos.FriendResponse'
         "400":
           description: Invalid Request
         "404":
@@ -390,6 +403,35 @@ paths:
         "500":
           description: Internal Server Error
       summary: Create friend request
+      tags:
+      - Friend
+  /friends/alias:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Friend Info
+        in: body
+        name: friend
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.FriendNicknameRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.FriendResponse'
+        "400":
+          description: Invalid Request
+        "404":
+          description: User or Friend Not Found
+        "409":
+          description: Relationship Already Exists
+        "500":
+          description: Internal Server Error
+      summary: add friend nickname
       tags:
       - Friend
   /friends/decline:
