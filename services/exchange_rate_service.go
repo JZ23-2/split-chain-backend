@@ -10,7 +10,6 @@ func FetchHBARRate() (float64, error) {
 	url := "https://api.coingecko.com/api/v3/simple/price?ids=hedera-hashgraph&vs_currencies=usd"
 
 	res, err := http.Get(url)
-
 	if err != nil {
 		return 0, nil
 	}
@@ -28,6 +27,6 @@ func FetchHBARRate() (float64, error) {
 		return 0, fmt.Errorf("invalid exchange rate")
 	}
 
-	// rate -> 1 USD = x HBAR 
-	return 1/usd, nil
+	// rate -> 1 USD = x HBAR
+	return 1 / usd, nil
 }

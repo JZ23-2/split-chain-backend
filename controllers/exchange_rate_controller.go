@@ -10,16 +10,16 @@ import (
 )
 
 // ConvertPricesToHBAR godoc
-// @Summary      Convert item prices to HBAR
-// @Description  Takes a receipt JSON, converts each item's price (after tax) to HBAR using the current rate, and returns the updated receipt.
-// @Tags         Rate Conversion
-// @Accept       json
-// @Produce      json
-// @Param        request body dtos.ReceiptResponse true "Receipt data"
-// @Success      200 {object} dtos.ReceiptResponse
-// @Failure      400 "Invalid request"
-// @Failure      500 "Failed to fetch HBAR rate"
-// @Router       /rate [post]
+//	@Summary		Convert item prices to HBAR
+//	@Description	Takes a receipt JSON, converts each item's price (after tax) to HBAR using the current rate, and returns the updated receipt.
+//	@Tags			Rate Conversion
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dtos.ReceiptResponse	true	"Receipt data"
+//	@Success		200		{object}	dtos.ReceiptResponse
+//	@Failure		400		"Invalid request"
+//	@Failure		500		"Failed to fetch HBAR rate"
+//	@Router			/rate [post]
 func ConvertPricesToHBAR(c *gin.Context) {
 	var req dtos.ReceiptResponse
 

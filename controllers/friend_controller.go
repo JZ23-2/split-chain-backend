@@ -11,18 +11,18 @@ import (
 )
 
 // AcceptFriendRequest godoc
-// @Summary Accept friend request
+//	@Summary	Accept friend request
 // Description Accept a friend request
-// @Tags Friend
-// @Accept json
-// @Produce json
-// @Param friend body dtos.AcceptFriendRequest true "Friend Info"
-// @Success 201 {object} dtos.AcceptFriendResponse
-// @Failure 400 "Invalid Request"
-// @Failure 404 "User or Friend Not Found"
-// @Failure 409 "Relationship Already Exists"
-// @Failure 500 "Internal Server Error"
-// @Router /friends/accept [post]
+//	@Tags		Friend
+//	@Accept		json
+//	@Produce	json
+//	@Param		friend	body		dtos.AcceptFriendRequest	true	"Friend Info"
+//	@Success	201		{object}	dtos.AcceptFriendResponse
+//	@Failure	400		"Invalid Request"
+//	@Failure	404		"User or Friend Not Found"
+//	@Failure	409		"Relationship Already Exists"
+//	@Failure	500		"Internal Server Error"
+//	@Router		/friends/accept [post]
 func AcceptFriendRequest(c *gin.Context) {
 	var req dtos.AcceptFriendRequest
 
@@ -80,18 +80,18 @@ func AcceptFriendRequest(c *gin.Context) {
 }
 
 // DeclineFriendRequest godoc
-// @Summary Decline friend request
+//	@Summary	Decline friend request
 // Description Decline a friend request
-// @Tags Friend
-// @Accept json
-// @Produce json
-// @Param friend body dtos.DeclineFriendRequest true "Friend Info"
-// @Success 201 {object} dtos.DeclineFriendResponse
-// @Failure 400 "Invalid Request"
-// @Failure 404 "User or Friend Not Found"
-// @Failure 409 "Relationship Already Exists"
-// @Failure 500 "Internal Server Error"
-// @Router /friends/decline [post]
+//	@Tags		Friend
+//	@Accept		json
+//	@Produce	json
+//	@Param		friend	body		dtos.DeclineFriendRequest	true	"Friend Info"
+//	@Success	201		{object}	dtos.DeclineFriendResponse
+//	@Failure	400		"Invalid Request"
+//	@Failure	404		"User or Friend Not Found"
+//	@Failure	409		"Relationship Already Exists"
+//	@Failure	500		"Internal Server Error"
+//	@Router		/friends/decline [post]
 func DeclineFriendRequest(c *gin.Context) {
 	var req dtos.DeclineFriendRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -122,18 +122,18 @@ func DeclineFriendRequest(c *gin.Context) {
 }
 
 // AddFriend godoc
-// @Summary Create friend request
+//	@Summary	Create friend request
 // Description Create a new friend request
-// @Tags Friend
-// @Accept json
-// @Produce json
-// @Param friend body dtos.AddFriendRequest true "Friend Info"
-// @Success 201 {object} dtos.AddFriendResponse
-// @Failure 400 "Invalid Request"
-// @Failure 404 "User or Friend Not Found"
-// @Failure 409 "Relationship Already Exists"
-// @Failure 500 "Internal Server Error"
-// @Router /friends/add [post]
+//	@Tags		Friend
+//	@Accept		json
+//	@Produce	json
+//	@Param		friend	body		dtos.AddFriendRequest	true	"Friend Info"
+//	@Success	201		{object}	dtos.AddFriendResponse
+//	@Failure	400		"Invalid Request"
+//	@Failure	404		"User or Friend Not Found"
+//	@Failure	409		"Relationship Already Exists"
+//	@Failure	500		"Internal Server Error"
+//	@Router		/friends/add [post]
 func AddFriend(c *gin.Context) {
 	var req dtos.AddFriendRequest
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
@@ -184,10 +184,10 @@ func AddFriend(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusOK, "Successfully Added Friend Request", response)
 }
 
-//TODO: Fetch Friend for user
-//Routes: /friend/{user_id}
-//Return: Friend array
+// TODO: Fetch Friend for user
+// Routes: /friend/{user_id}
+// Return: Friend array
 
-//TODO: Add alias for friend
-//Routes: /friend/alias/{user_id}/{friend_id}
-//Description: Jackson mau update nama VK di tempat friend nya jadi apa
+// TODO: Add alias for friend
+// Routes: /friend/alias/{user_id}/{friend_id}
+// Description: Jackson mau update nama VK di tempat friend nya jadi apa

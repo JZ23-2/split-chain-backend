@@ -11,15 +11,15 @@ import (
 )
 
 // GetParticipantDetail godoc
-// @Summary Get participant Bills
-// @Description Get participant all bills
-// @Tags Participants
-// @Accept  json
-// @Produce  json
-// @Param participant_id path string true "Participant ID"
-// @Success 200 {object} dtos.ParticipantDetailResponse
-// @Failure 404 {object} map[string]string
-// @Router /participants/{participant_id} [get]
+//	@Summary		Get participant Bills
+//	@Description	Get participant all bills
+//	@Tags			Participants
+//	@Accept			json
+//	@Produce		json
+//	@Param			participant_id	path		string	true	"Participant ID"
+//	@Success		200				{object}	dtos.ParticipantDetailResponse
+//	@Failure		404				{object}	map[string]string
+//	@Router			/participants/{participant_id} [get]
 func GetParticipantBills(c *gin.Context) {
 	participantId := c.Param("participant_id")
 	var participants []models.Participant
@@ -29,7 +29,6 @@ func GetParticipantBills(c *gin.Context) {
 		Preload("Bill").
 		Preload("Items").
 		Find(&participants).Error
-
 	if err != nil {
 		utils.FailedResponse(c, http.StatusInternalServerError, "DB error")
 		return
@@ -53,20 +52,19 @@ func GetParticipantBills(c *gin.Context) {
 	}
 
 	utils.SuccessResponse(c, http.StatusOK, "Participant details retrieved successfully", resp)
-
 }
 
 // GetParticipantDetail godoc
-// @Summary Get participant detail in a bill
-// @Description Retrieve participant detail including bill and items using billId and participantId
-// @Tags Participants
-// @Accept json
-// @Produce json
-// @Param request body dtos.GetParticipantDetailRequest true "Bill and Participant IDs"
-// @Success 200 {object} dtos.ParticipantDetailResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Router /participants/{participant_id}/{bill_id} [get]
+//	@Summary		Get participant detail in a bill
+//	@Description	Retrieve participant detail including bill and items using billId and participantId
+//	@Tags			Participants
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		dtos.GetParticipantDetailRequest	true	"Bill and Participant IDs"
+//	@Success		200		{object}	dtos.ParticipantDetailResponse
+//	@Failure		400		{object}	map[string]string
+//	@Failure		404		{object}	map[string]string
+//	@Router			/participants/{participant_id}/{bill_id} [get]
 func GetParticipantDetail(c *gin.Context) {
 	participantId := c.Param("participant_id")
 	billId := c.Param("bill_id")
@@ -77,7 +75,6 @@ func GetParticipantDetail(c *gin.Context) {
 		Preload("Bill").
 		Preload("Items", "bill_id = ? AND participant_id = ?", billId, participantId).
 		First(&participant).Error
-
 	if err != nil {
 		utils.FailedResponse(c, http.StatusNotFound, "Participant Not Found")
 		return

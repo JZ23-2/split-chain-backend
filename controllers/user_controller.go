@@ -12,17 +12,17 @@ import (
 )
 
 // RegisterUser godoc
-// @Summary      Register a new user
-// @Description  Save wallet address to database
-// @Tags         users
-// @Accept       json
-// @Produce      json
-// @Param        user body models.User true "User info"
-// @Success      200  {object}  map[string]interface{}
-// @Failure      400  {object}  map[string]string
-// @Failure      409  {object}  map[string]string
-// @Failure      500  {object}  map[string]string
-// @Router       /users [post]
+//	@Summary		Register a new user
+//	@Description	Save wallet address to database
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		models.User	true	"User info"
+//	@Success		200		{object}	map[string]interface{}
+//	@Failure		400		{object}	map[string]string
+//	@Failure		409		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Router			/users [post]
 func RegisterUser(c *gin.Context) {
 	var input models.User
 

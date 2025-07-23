@@ -2,7 +2,7 @@ package dtos
 
 type SuccessResponse struct {
 	Message string `json:"message"`
-	Data    any `json:"data"`
+	Data    any    `json:"data"`
 }
 
 type FailedResponse struct {

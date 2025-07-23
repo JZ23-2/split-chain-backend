@@ -10,12 +10,12 @@ import (
 )
 
 // ConfirmTransaction godoc
-// @Summary Example confirm a payment
-// @Description example return confirms a payment on Hedera
-// @Tags Payment
-// @Produce json
-// @Success 200 {object} map[string]interface{}
-// @Router /confirm-payment [get]
+//	@Summary		Example confirm a payment
+//	@Description	example return confirms a payment on Hedera
+//	@Tags			Payment
+//	@Produce		json
+//	@Success		200	{object}	map[string]interface{}
+//	@Router			/confirm-payment [get]
 func ConfirmTransaction(c *gin.Context) {
 	rawTxID := "0.0.6357764@1752648750.206207259"
 

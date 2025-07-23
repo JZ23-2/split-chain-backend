@@ -13,16 +13,16 @@ import (
 )
 
 // CreateBill godoc
-// @Summary Create a new bill
-// @Description Create a bill with participants and their items
-// @Tags Bill
-// @Accept json
-// @Produce json
-// @Param bill body dtos.CreateBillRequest true "Bill Info"
-// @Success 201 {object} dtos.CreateBillResponse
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /bills [post]
+//	@Summary		Create a new bill
+//	@Description	Create a bill with participants and their items
+//	@Tags			Bill
+//	@Accept			json
+//	@Produce		json
+//	@Param			bill	body		dtos.CreateBillRequest	true	"Bill Info"
+//	@Success		201		{object}	dtos.CreateBillResponse
+//	@Failure		400		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Router			/bills [post]
 func CreateBill(c *gin.Context) {
 	var req dtos.CreateBillRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
