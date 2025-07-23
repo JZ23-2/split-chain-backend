@@ -177,7 +177,54 @@ func AddFriend(c *gin.Context) {
 		req.UserWalletAddress, req.FriendWalletAddress,
 		req.FriendWalletAddress, req.UserWalletAddress,
 	).First(&existing).Error; err == nil {
-		utils.FailedResponse(c, http.StatusConflict, "Friend request already exists (in either direction)")
+		friend1 := models.Friend{
+			UserWalletAddress:   req.FriendWalletAddress,
+			FriendWalletAddress: req.UserWalletAddress,
+		}
+
+		friend2 := models.Friend{
+			UserWalletAddress:   req.UserWalletAddress,
+			FriendWalletAddress: req.FriendWalletAddress,
+		}
+
+		if err := database.DB.Create(&friend1).Error; err != nil {
+			utils.FailedResponse(c, http.StatusInternalServerError, "Failed to create friends")
+			return
+		}
+
+		if err := database.DB.Create(&friend2).Error; err != nil {
+			utils.FailedResponse(c, http.StatusInternalServerError, "Failed to create friends")
+			return
+		}
+
+		friend1Resp := dtos.AcceptFriendResponse{
+			ID:                  friend1.ID,
+			UserWalletAddress:   friend1.UserWalletAddress,
+			FriendWalletAddress: friend1.FriendWalletAddress,
+			Nickname:            &friend1.Nickname,
+		}
+
+		friend2Resp := dtos.AcceptFriendResponse{
+			ID:                  friend2.ID,
+			UserWalletAddress:   friend2.UserWalletAddress,
+			FriendWalletAddress: friend2.FriendWalletAddress,
+			Nickname:            &friend2.Nickname,
+		}
+
+		if err := database.DB.Where(
+			"(user_wallet_address = ? AND friend_wallet_address = ?) OR (user_wallet_address = ? AND friend_wallet_address = ?)",
+			req.UserWalletAddress, req.FriendWalletAddress,
+			req.FriendWalletAddress, req.UserWalletAddress,
+		).Delete(&models.PendingFriendRequest{}).Error; err != nil {
+			utils.FailedResponse(c, http.StatusInternalServerError, "Failed to delete pending requests")
+			return
+		}
+
+		utils.SuccessResponse(c, http.StatusOK, "Friend Request Accepted", gin.H{
+			"friend_1": friend1Resp,
+			"friend_2": friend2Resp,
+		})
+
 		return
 	}
 
