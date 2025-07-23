@@ -114,7 +114,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/friend/accept-friend": {
+        "/friends/accept": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -159,7 +159,52 @@ const docTemplate = `{
                 }
             }
         },
-        "/friend/decline-friend": {
+        "/friends/add": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Friend"
+                ],
+                "summary": "Create friend request",
+                "parameters": [
+                    {
+                        "description": "Friend Info",
+                        "name": "friend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.AddFriendRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.AddFriendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Request"
+                    },
+                    "404": {
+                        "description": "User or Friend Not Found"
+                    },
+                    "409": {
+                        "description": "Relationship Already Exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/friends/decline": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -255,7 +300,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Participant"
+                    "Participants"
                 ],
                 "summary": "Get participant detail in a bill",
                 "parameters": [
@@ -293,51 +338,6 @@ const docTemplate = `{
                                 "type": "string"
                             }
                         }
-                    }
-                }
-            }
-        },
-        "/pending-friend-request/send-request": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Pending Friend Request"
-                ],
-                "summary": "Create friend request",
-                "parameters": [
-                    {
-                        "description": "Friend Info",
-                        "name": "friend",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dtos.AddFriendRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.AddFriendResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid Request"
-                    },
-                    "404": {
-                        "description": "User or Friend Not Found"
-                    },
-                    "409": {
-                        "description": "Relationship Already Exists"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -487,18 +487,10 @@ const docTemplate = `{
         "dtos.AcceptFriendRequest": {
             "type": "object",
             "required": [
-                "friend_wallet_address",
-                "id",
-                "user_wallet_address"
+                "id"
             ],
             "properties": {
-                "friend_wallet_address": {
-                    "type": "string"
-                },
                 "id": {
-                    "type": "string"
-                },
-                "user_wallet_address": {
                     "type": "string"
                 }
             }
@@ -678,14 +670,10 @@ const docTemplate = `{
         "dtos.DeclineFriendRequest": {
             "type": "object",
             "required": [
-                "friend_wallet_address",
-                "user_wallet_address"
+                "id"
             ],
             "properties": {
-                "friend_wallet_address": {
-                    "type": "string"
-                },
-                "user_wallet_address": {
+                "id": {
                     "type": "string"
                 }
             }

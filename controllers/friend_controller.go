@@ -22,38 +22,38 @@ import (
 // @Failure 404 "User or Friend Not Found"
 // @Failure 409 "Relationship Already Exists"
 // @Failure 500 "Internal Server Error"
-// @Router /friend/accept-friend [post]
+// @Router /friends/accept [post]
 func AcceptFriendRequest(c *gin.Context) {
 	var req dtos.AcceptFriendRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.FailedResponse(c, http.StatusBadRequest, "invalid request")
+		utils.FailedResponse(c, http.StatusBadRequest, "Invalid Request")
 		return
 	}
 
 	var pending models.PendingFriendRequest
 	if err := database.DB.First(&pending, "id = ?", req.ID).Error; err != nil {
-		utils.FailedResponse(c, http.StatusNotFound, "pending friend request not found")
+		utils.FailedResponse(c, http.StatusNotFound, "Not Found")
 		return
 	}
 
 	friend1 := models.Friend{
-		UserWalletAddress:   req.UserWalletAddress,
-		FriendWalletAddress: req.FriendWalletAddress,
+		UserWalletAddress:   pending.FriendWalletAddress,
+		FriendWalletAddress: pending.UserWalletAddress,
 	}
 
 	friend2 := models.Friend{
-		UserWalletAddress:   req.FriendWalletAddress,
-		FriendWalletAddress: req.UserWalletAddress,
+		UserWalletAddress:   pending.UserWalletAddress,
+		FriendWalletAddress: pending.FriendWalletAddress,
 	}
 
 	if err := database.DB.Create(&friend1).Error; err != nil {
-		utils.FailedResponse(c, http.StatusInternalServerError, "failed to create friend")
+		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to create friends")
 		return
 	}
 
 	if err := database.DB.Create(&friend2).Error; err != nil {
-		utils.FailedResponse(c, http.StatusInternalServerError, "failed to create friend")
+		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to create friends")
 		return
 	}
 
@@ -73,7 +73,7 @@ func AcceptFriendRequest(c *gin.Context) {
 
 	database.DB.Delete(&pending)
 
-	utils.SuccessResponse(c, http.StatusOK, "friend request accepted", gin.H{
+	utils.SuccessResponse(c, http.StatusOK, "Friend Request Accepted", gin.H{
 		"friend_1": friend1Resp,
 		"friend_2": friend2Resp,
 	})
@@ -91,7 +91,7 @@ func AcceptFriendRequest(c *gin.Context) {
 // @Failure 404 "User or Friend Not Found"
 // @Failure 409 "Relationship Already Exists"
 // @Failure 500 "Internal Server Error"
-// @Router /friend/decline-friend [post]
+// @Router /friends/decline [post]
 func DeclineFriendRequest(c *gin.Context) {
 	var req dtos.DeclineFriendRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -100,11 +100,8 @@ func DeclineFriendRequest(c *gin.Context) {
 	}
 
 	var pending models.PendingFriendRequest
-	if err := database.DB.Where(
-		"user_wallet_address = ? AND friend_wallet_address = ? AND status = ?",
-		req.UserWalletAddress, req.FriendWalletAddress, "Pending",
-	).First(&pending).Error; err != nil {
-		utils.FailedResponse(c, http.StatusNotFound, "Pending friend request not found")
+	if err := database.DB.First(&pending, "id = ?", req.ID).Error; err != nil {
+		utils.FailedResponse(c, http.StatusNotFound, "Not Found")
 		return
 	}
 
@@ -127,7 +124,7 @@ func DeclineFriendRequest(c *gin.Context) {
 // AddFriend godoc
 // @Summary Create friend request
 // Description Create a new friend request
-// @Tags Pending Friend Request
+// @Tags Friend
 // @Accept json
 // @Produce json
 // @Param friend body dtos.AddFriendRequest true "Friend Info"
@@ -136,7 +133,7 @@ func DeclineFriendRequest(c *gin.Context) {
 // @Failure 404 "User or Friend Not Found"
 // @Failure 409 "Relationship Already Exists"
 // @Failure 500 "Internal Server Error"
-// @Router /pending-friend-request/send-request [post]
+// @Router /friends/add [post]
 func AddFriend(c *gin.Context) {
 	var req dtos.AddFriendRequest
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
@@ -146,23 +143,24 @@ func AddFriend(c *gin.Context) {
 
 	var user, friend models.User
 	if err := database.DB.First(&user, "wallet_address = ?", req.UserWalletAddress).Error; err != nil {
-		utils.FailedResponse(c, http.StatusNotFound, "user Not Found")
+		utils.FailedResponse(c, http.StatusNotFound, "User Not Found")
 		return
 	}
+
 	if err := database.DB.First(&friend, "wallet_address = ?", req.FriendWalletAddress).Error; err != nil {
-		utils.FailedResponse(c, http.StatusNotFound, "friend Not Found")
+		utils.FailedResponse(c, http.StatusNotFound, "Friend Not Found")
 		return
 	}
 
 	var existing models.PendingFriendRequest
 	if err := database.DB.Where("user_wallet_address = ? AND friend_wallet_address = ?", req.UserWalletAddress, req.FriendWalletAddress).First(&existing).Error; err == nil {
-		utils.FailedResponse(c, http.StatusConflict, "friend request already send")
+		utils.FailedResponse(c, http.StatusConflict, "Friend Request Already Send")
 		return
 	}
 
 	var friendCheck models.Friend
 	if err := database.DB.Where("user_wallet_address = ? AND friend_wallet_address = ?", req.UserWalletAddress, req.FriendWalletAddress).First(&friendCheck).Error; err == nil {
-		utils.FailedResponse(c, http.StatusConflict, "already friend")
+		utils.FailedResponse(c, http.StatusConflict, "Already Friend")
 		return
 	}
 
@@ -172,7 +170,7 @@ func AddFriend(c *gin.Context) {
 	}
 
 	if err := database.DB.Create(&newRequest).Error; err != nil {
-		utils.FailedResponse(c, http.StatusInternalServerError, "failed to create friend request")
+		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to create friend request")
 		return
 	}
 
@@ -180,8 +178,16 @@ func AddFriend(c *gin.Context) {
 		ID:                  newRequest.ID,
 		UserWalletAddress:   newRequest.UserWalletAddress,
 		FriendWalletAddress: newRequest.FriendWalletAddress,
-		Status:              newRequest.Status,
+		Status:              "Pending",
 	}
 
-	utils.SuccessResponse(c, http.StatusOK, "saved friend success", response)
+	utils.SuccessResponse(c, http.StatusOK, "Successfully Added Friend Request", response)
 }
+
+//TODO: Fetch Friend for user
+//Routes: /friend/{user_id}
+//Return: Friend array
+
+//TODO: Add alias for friend
+//Routes: /friend/alias/{user_id}/{friend_id}
+//Description: Jackson mau update nama VK di tempat friend nya jadi apa

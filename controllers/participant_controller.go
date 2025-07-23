@@ -59,7 +59,7 @@ func GetParticipantBills(c *gin.Context) {
 // GetParticipantDetail godoc
 // @Summary Get participant detail in a bill
 // @Description Retrieve participant detail including bill and items using billId and participantId
-// @Tags Participant
+// @Tags Participants
 // @Accept json
 // @Produce json
 // @Param request body dtos.GetParticipantDetailRequest true "Bill and Participant IDs"

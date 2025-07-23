@@ -13,9 +13,7 @@ type AddFriendResponse struct {
 }
 
 type AcceptFriendRequest struct {
-	ID                  string `json:"id" binding:"required"`
-	UserWalletAddress   string `json:"user_wallet_address" binding:"required"`
-	FriendWalletAddress string `json:"friend_wallet_address" binding:"required"`
+	ID string `json:"id" binding:"required"`
 }
 
 type AcceptFriendResponse struct {
@@ -26,8 +24,7 @@ type AcceptFriendResponse struct {
 }
 
 type DeclineFriendRequest struct {
-	UserWalletAddress   string `json:"user_wallet_address" binding:"required"`
-	FriendWalletAddress string `json:"friend_wallet_address" binding:"required"`
+	ID string `json:"id" binding:"required"`
 }
 
 type DeclineFriendResponse struct {
