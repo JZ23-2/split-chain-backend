@@ -11,8 +11,11 @@ import (
 )
 
 // AcceptFriendRequest godoc
+//
 //	@Summary	Accept friend request
+//
 // Description Accept a friend request
+//
 //	@Tags		Friend
 //	@Accept		json
 //	@Produce	json
@@ -80,8 +83,11 @@ func AcceptFriendRequest(c *gin.Context) {
 }
 
 // DeclineFriendRequest godoc
+//
 //	@Summary	Decline friend request
+//
 // Description Decline a friend request
+//
 //	@Tags		Friend
 //	@Accept		json
 //	@Produce	json
@@ -122,8 +128,11 @@ func DeclineFriendRequest(c *gin.Context) {
 }
 
 // AddFriend godoc
+//
 //	@Summary	Create friend request
+//
 // Description Create a new friend request
+//
 //	@Tags		Friend
 //	@Accept		json
 //	@Produce	json
@@ -153,6 +162,16 @@ func AddFriend(c *gin.Context) {
 	}
 
 	var existing models.PendingFriendRequest
+	if err := database.DB.Where("user_wallet_address = ? AND friend_wallet_address = ? AND status = ?", req.UserWalletAddress, req.FriendWalletAddress, "Declined").First(&existing).Error; err == nil {
+		existing.Status = "Pending"
+		if err := database.DB.Save(&existing).Error; err != nil {
+			utils.FailedResponse(c, http.StatusInternalServerError, "Failed")
+			return
+		}
+		utils.SuccessResponse(c, http.StatusOK, "Successfully Added Friend Request", existing)
+		return
+	}
+
 	if err := database.DB.Where("user_wallet_address = ? AND friend_wallet_address = ?", req.UserWalletAddress, req.FriendWalletAddress).First(&existing).Error; err == nil {
 		utils.FailedResponse(c, http.StatusConflict, "Friend Request Already Send")
 		return
