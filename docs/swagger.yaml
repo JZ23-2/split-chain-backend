@@ -97,6 +97,87 @@ definitions:
       totalAmount:
         type: integer
     type: object
+  dtos.CreateBillWithoutParticipantItemRequest:
+    properties:
+      name:
+        example: Steak
+        type: string
+      price:
+        example: 40000
+        type: integer
+      priceAfterTax:
+        example: 87200
+        type: number
+      priceInHBAR:
+        example: 0
+        type: number
+      quantity:
+        example: 2
+        type: integer
+    type: object
+  dtos.CreateBillWithoutParticipantItemResponse:
+    properties:
+      itemId:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      priceAfterTax:
+        type: number
+      priceInHBAR:
+        type: number
+      quantity:
+        type: integer
+    type: object
+  dtos.CreateBillWithoutParticipantRequest:
+    properties:
+      creatorId:
+        example: user123
+        type: string
+      date:
+        example: "2019-11-02"
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dtos.CreateBillWithoutParticipantItemRequest'
+        type: array
+      service:
+        example: 0
+        type: number
+      storeName:
+        example: East Repair Inc.
+        type: string
+      tax:
+        example: 9.06
+        type: number
+      totalAmount:
+        example: 15406
+        type: integer
+    type: object
+  dtos.CreateBillWithoutParticipantResponse:
+    properties:
+      billId:
+        type: string
+      createdAt:
+        type: string
+      creatorId:
+        type: string
+      date:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dtos.CreateBillWithoutParticipantItemResponse'
+        type: array
+      service:
+        type: number
+      storeName:
+        type: string
+      tax:
+        type: number
+      totalAmount:
+        type: integer
+    type: object
   dtos.CreateItemRequest:
     properties:
       name:
@@ -165,6 +246,36 @@ definitions:
       nickname:
         type: string
     type: object
+  dtos.GetBillByCreatorItemResponse:
+    properties:
+      itemId:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  dtos.GetBillByCreatorResponse:
+    properties:
+      billId:
+        type: string
+      billTitle:
+        type: string
+      createdAt:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dtos.GetBillByCreatorItemResponse'
+        type: array
+      service:
+        type: number
+      tax:
+        type: number
+      totalAmount:
+        type: integer
+    type: object
   dtos.GetParticipantDetailRequest:
     properties:
       billId:
@@ -222,6 +333,8 @@ definitions:
         items:
           $ref: '#/definitions/dtos.ReceiptItem'
         type: array
+      service:
+        type: number
       storeName:
         example: Nigger Store
         type: string
@@ -231,6 +344,12 @@ definitions:
       totalAmount:
         example: 15.4
         type: number
+    type: object
+  dtos.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
     type: object
   models.Item:
     properties:
@@ -243,6 +362,8 @@ definitions:
       participantId:
         type: string
       price:
+        type: integer
+      quantity:
         type: integer
     type: object
   models.User:
@@ -289,6 +410,86 @@ paths:
               type: string
             type: object
       summary: Create a new bill
+      tags:
+      - Bill
+  /bills/bill-without-participant:
+    post:
+      consumes:
+      - application/json
+      description: Save a bill with items, tax, and service, without splitting between
+        participants
+      parameters:
+      - description: Bill Data without participant
+        in: body
+        name: bill
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateBillWithoutParticipantRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.CreateBillWithoutParticipantResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create bill (no participants)
+      tags:
+      - Bill
+  /bills/by-creator:
+    get:
+      consumes:
+      - application/json
+      description: Get all bills created by a specific creator, optionally filter
+        by billId
+      parameters:
+      - description: Creator ID
+        in: query
+        name: creatorId
+        required: true
+        type: string
+      - description: Bill ID (optional filter)
+        in: query
+        name: billId
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dtos.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dtos.GetBillByCreatorResponse'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get bills by creator
       tags:
       - Bill
   /check:
@@ -463,6 +664,26 @@ paths:
       summary: Decline friend request
       tags:
       - Friend
+  /get-rate:
+    get:
+      consumes:
+      - application/json
+      description: Get HBAR Rate by 1 USD
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success get HBAR rate
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request
+        "500":
+          description: Failed to fetch HBAR rate
+      summary: Get HBAR Rate (1 USD)
+      tags:
+      - Rate
   /participants/{participant_id}:
     get:
       consumes:
@@ -525,33 +746,6 @@ paths:
       summary: Get participant detail in a bill
       tags:
       - Participants
-  /rate:
-    post:
-      consumes:
-      - application/json
-      description: Takes a receipt JSON, converts each item's price (after tax) to
-        HBAR using the current rate, and returns the updated receipt.
-      parameters:
-      - description: Receipt data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dtos.ReceiptResponse'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.ReceiptResponse'
-        "400":
-          description: Invalid request
-        "500":
-          description: Failed to fetch HBAR rate
-      summary: Convert item prices to HBAR
-      tags:
-      - Rate Conversion
   /receipt/:
     post:
       consumes:

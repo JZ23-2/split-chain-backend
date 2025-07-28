@@ -11,6 +11,7 @@ Extract structured info from this receipt image and return JSON only in this for
     }
   ],
   "tax": float,
+  "service": float
   "totalAmount": float
 }
 Only respond with JSON. Use null if any value is unclear.

@@ -14,5 +14,6 @@ type ReceiptResponse struct {
 	Date        string        `json:"date" example:"2025-10-02"`
 	Tax         float32       `json:"tax" example:"9.10"`
 	TotalAmount float32       `json:"totalAmount" example:"15.40"`
+	Service     float32       `json:"service"`
 	Items       []ReceiptItem `json:"items"`
 }

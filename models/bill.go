@@ -14,6 +14,9 @@ type Bill struct {
 	CreatorID    string        `gorm:"type:varchar(255)" json:"creatorId"`
 	Creator      User          `gorm:"foreignKey:CreatorID" json:"creator"`
 	CreatedAt    time.Time     `json:"createdAt"`
+	Tax          float32       `json:"tax"`
+	Service      float32       `json:"service"`
+	Items        []Item        `gorm:"foreignKey:BillID;references:BillID" json:"items"`
 	Participants []Participant `gorm:"foreignKey:BillID" json:"participants"`
 }
 

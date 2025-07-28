@@ -13,6 +13,7 @@ import (
 )
 
 // CreateBill godoc
+//
 //	@Summary		Create a new bill
 //	@Description	Create a bill with participants and their items
 //	@Tags			Bill
@@ -50,7 +51,7 @@ func CreateBill(c *gin.Context) {
 		for _, item := range p.Items {
 			participant.Items = append(participant.Items, models.Item{
 				ItemID:        uuid.NewString(),
-				ParticipantID: p.ParticipantID,
+				ParticipantID: &p.ParticipantID,
 				Name:          item.Name,
 				Price:         item.Price,
 			})
@@ -91,4 +92,143 @@ func CreateBill(c *gin.Context) {
 	}
 
 	utils.SuccessResponse(c, http.StatusCreated, "Bill created successfully", resp)
+}
+
+// CreateSimpleBill godoc
+// @Summary      Create bill (no participants)
+// @Description  Save a bill with items, tax, and service, without splitting between participants
+// @Tags         Bill
+// @Accept       json
+// @Produce      json
+// @Param        bill  body      dtos.CreateBillWithoutParticipantRequest  true  "Bill Data without participant"
+// @Success      201   {object}  dtos.CreateBillWithoutParticipantResponse
+// @Failure      400   {object}  map[string]string
+// @Failure      500   {object}  map[string]string
+// @Router       /bills/bill-without-participant [post]
+func CreateBillWithoutParticipant(c *gin.Context) {
+	var req dtos.CreateBillWithoutParticipantRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.FailedResponse(c, http.StatusBadRequest, "invalid request")
+		return
+	}
+
+	billID := uuid.NewString()
+	bill := models.Bill{
+		BillID:      billID,
+		BillTitle:   req.StoreName,
+		TotalAmount: req.TotalAmount,
+		Tax:         req.Tax,
+		Service:     req.Service,
+		CreatorID:   req.CreatorID,
+		CreatedAt:   time.Now(),
+	}
+
+	if err := database.DB.Create(&bill).Error; err != nil {
+		utils.FailedResponse(c, http.StatusInternalServerError, "failed to create bill: "+err.Error())
+		return
+	}
+
+	var itemResponses []dtos.CreateBillWithoutParticipantItemResponse
+
+	for _, item := range req.Items {
+		itemID := uuid.NewString()
+
+		newItem := models.Item{
+			ItemID:        itemID,
+			BillID:        billID,
+			ParticipantID: nil,
+			Name:          item.Name,
+			Price:         item.UnitPrice,
+			Quantity:      item.Quantity,
+		}
+
+		if err := database.DB.Create(&newItem).Error; err != nil {
+			utils.FailedResponse(c, http.StatusInternalServerError, "failed to create item: "+err.Error())
+			return
+		}
+
+		itemResponses = append(itemResponses, dtos.CreateBillWithoutParticipantItemResponse{
+			ItemID:        itemID,
+			Name:          item.Name,
+			Quantity:      item.Quantity,
+			UnitPrice:     item.UnitPrice,
+			PriceAfterTax: item.PriceAfterTax,
+			PriceInHBAR:   item.PriceInHBAR,
+		})
+	}
+
+	resp := dtos.CreateBillWithoutParticipantResponse{
+		BillID:      billID,
+		StoreName:   req.StoreName,
+		Date:        req.Date,
+		Tax:         req.Tax,
+		Service:     req.Service,
+		TotalAmount: req.TotalAmount,
+		CreatedAt:   bill.CreatedAt.Format(time.RFC3339),
+		CreatorID:   req.CreatorID,
+		Items:       itemResponses,
+	}
+
+	utils.SuccessResponse(c, http.StatusCreated, "Bill without participant created successfully", resp)
+}
+
+// GetBillByCreator godoc
+//
+//	@Summary		Get bills by creator
+//	@Description	Get all bills created by a specific creator, optionally filter by billId
+//	@Tags			Bill
+//	@Accept			json
+//	@Produce		json
+//	@Param			creatorId	query		string	true	"Creator ID"
+//	@Param			billId		query		string	false	"Bill ID (optional filter)"
+//	@Success		200			{object}	dtos.SuccessResponse{data=[]dtos.GetBillByCreatorResponse}
+//	@Failure		400			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Router			/bills/by-creator [get]
+func GetBillByCreator(c *gin.Context) {
+	creatorId := c.Query("creatorId")
+	billId := c.Query("billId")
+
+	if creatorId == "" {
+		utils.FailedResponse(c, http.StatusBadRequest, "Creator Id is required")
+		return
+	}
+
+	var bills []models.Bill
+	query := database.DB.Preload("Items").Where("creator_id = ?", creatorId)
+
+	if billId != "" {
+		query = query.Where("bill_id = ?", billId)
+	}
+
+	if err := query.Find(&bills).Error; err != nil {
+		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to fetch bills")
+		return
+	}
+
+	var response []dtos.GetBillByCreatorResponse
+	for _, bill := range bills {
+		var itemResponses []dtos.GetBillByCreatorItemResponse
+		for _, item := range bill.Items {
+			itemResponses = append(itemResponses, dtos.GetBillByCreatorItemResponse{
+				ItemID:   item.ItemID,
+				Name:     item.Name,
+				Price:    item.Price,
+				Quantity: item.Quantity,
+			})
+		}
+
+		response = append(response, dtos.GetBillByCreatorResponse{
+			BillID:      bill.BillID,
+			BillTitle:   bill.BillTitle,
+			TotalAmount: bill.TotalAmount,
+			Tax:         bill.Tax,
+			Service:     bill.Service,
+			CreatedAt:   bill.CreatedAt.Format(time.RFC3339),
+			Items:       itemResponses,
+		})
+
+	}
+	utils.SuccessResponse(c, http.StatusOK, "Bill Fetched", response)
 }

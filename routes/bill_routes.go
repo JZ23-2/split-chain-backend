@@ -9,5 +9,7 @@ func BillRoutes(api *gin.RouterGroup) {
 	bill := api.Group("/bills")
 	{
 		bill.POST("/", controllers.CreateBill)
+		bill.POST("/bill-without-participant", controllers.CreateBillWithoutParticipant)
+		bill.GET("/by-creator", controllers.GetBillByCreator)
 	}
 }

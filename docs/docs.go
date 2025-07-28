@@ -72,6 +72,129 @@ const docTemplate = `{
                 }
             }
         },
+        "/bills/bill-without-participant": {
+            "post": {
+                "description": "Save a bill with items, tax, and service, without splitting between participants",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Create bill (no participants)",
+                "parameters": [
+                    {
+                        "description": "Bill Data without participant",
+                        "name": "bill",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CreateBillWithoutParticipantRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CreateBillWithoutParticipantResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bills/by-creator": {
+            "get": {
+                "description": "Get all bills created by a specific creator, optionally filter by billId",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Get bills by creator",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Creator ID",
+                        "name": "creatorId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bill ID (optional filter)",
+                        "name": "billId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/dtos.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dtos.GetBillByCreatorResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/check": {
             "get": {
                 "description": "Check backend health",
@@ -337,6 +460,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/get-rate": {
+            "get": {
+                "description": "Get HBAR Rate by 1 USD",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rate"
+                ],
+                "summary": "Get HBAR Rate (1 USD)",
+                "responses": {
+                    "200": {
+                        "description": "success get HBAR rate",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    },
+                    "500": {
+                        "description": "Failed to fetch HBAR rate"
+                    }
+                }
+            }
+        },
         "/participants/{participant_id}": {
             "get": {
                 "description": "Get participant all bills",
@@ -426,46 +579,6 @@ const docTemplate = `{
                                 "type": "string"
                             }
                         }
-                    }
-                }
-            }
-        },
-        "/rate": {
-            "post": {
-                "description": "Takes a receipt JSON, converts each item's price (after tax) to HBAR using the current rate, and returns the updated receipt.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Rate Conversion"
-                ],
-                "summary": "Convert item prices to HBAR",
-                "parameters": [
-                    {
-                        "description": "Receipt data",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ReceiptResponse"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ReceiptResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request"
-                    },
-                    "500": {
-                        "description": "Failed to fetch HBAR rate"
                     }
                 }
             }
@@ -719,6 +832,124 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.CreateBillWithoutParticipantItemRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Steak"
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 40000
+                },
+                "priceAfterTax": {
+                    "type": "number",
+                    "example": 87200
+                },
+                "priceInHBAR": {
+                    "type": "number",
+                    "example": 0
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "dtos.CreateBillWithoutParticipantItemResponse": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "priceAfterTax": {
+                    "type": "number"
+                },
+                "priceInHBAR": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.CreateBillWithoutParticipantRequest": {
+            "type": "object",
+            "properties": {
+                "creatorId": {
+                    "type": "string",
+                    "example": "user123"
+                },
+                "date": {
+                    "type": "string",
+                    "example": "2019-11-02"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CreateBillWithoutParticipantItemRequest"
+                    }
+                },
+                "service": {
+                    "type": "number",
+                    "example": 0
+                },
+                "storeName": {
+                    "type": "string",
+                    "example": "East Repair Inc."
+                },
+                "tax": {
+                    "type": "number",
+                    "example": 9.06
+                },
+                "totalAmount": {
+                    "type": "integer",
+                    "example": 15406
+                }
+            }
+        },
+        "dtos.CreateBillWithoutParticipantResponse": {
+            "type": "object",
+            "properties": {
+                "billId": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "creatorId": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.CreateBillWithoutParticipantItemResponse"
+                    }
+                },
+                "service": {
+                    "type": "number"
+                },
+                "storeName": {
+                    "type": "string"
+                },
+                "tax": {
+                    "type": "number"
+                },
+                "totalAmount": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.CreateItemRequest": {
             "type": "object",
             "properties": {
@@ -820,6 +1051,52 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.GetBillByCreatorItemResponse": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.GetBillByCreatorResponse": {
+            "type": "object",
+            "properties": {
+                "billId": {
+                    "type": "string"
+                },
+                "billTitle": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.GetBillByCreatorItemResponse"
+                    }
+                },
+                "service": {
+                    "type": "number"
+                },
+                "tax": {
+                    "type": "number"
+                },
+                "totalAmount": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.GetParticipantDetailRequest": {
             "type": "object",
             "required": [
@@ -903,6 +1180,9 @@ const docTemplate = `{
                         "$ref": "#/definitions/dtos.ReceiptItem"
                     }
                 },
+                "service": {
+                    "type": "number"
+                },
                 "storeName": {
                     "type": "string",
                     "example": "Nigger Store"
@@ -914,6 +1194,15 @@ const docTemplate = `{
                 "totalAmount": {
                     "type": "number",
                     "example": 15.4
+                }
+            }
+        },
+        "dtos.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
                 }
             }
         },
@@ -933,6 +1222,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "price": {
+                    "type": "integer"
+                },
+                "quantity": {
                     "type": "integer"
                 }
             }

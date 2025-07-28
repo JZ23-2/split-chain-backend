@@ -6,5 +6,5 @@ import (
 )
 
 func ExchangeRateRoute(api *gin.RouterGroup) {
-	api.POST("/rate", controllers.ConvertPricesToHBAR)
+	api.GET("/get-rate", controllers.ConvertPricesToHBAR)
 }
