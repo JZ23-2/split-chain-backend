@@ -95,7 +95,7 @@ func CreateBill(c *gin.Context) {
 	utils.SuccessResponse(c, http.StatusCreated, "Bill created successfully", resp)
 }
 
-// CreateSimpleBill godoc
+// CreateBillWithoutParticipant godoc
 // @Summary      Create bill (no participants)
 // @Description  Save a bill with items, tax, and service, without splitting between participants
 // @Tags         Bill
