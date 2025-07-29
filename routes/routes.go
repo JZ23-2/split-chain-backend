@@ -30,7 +30,7 @@ func SetUpRoutes() {
 
 		UserRoutes(api)
 		fmt.Println("logging here")
-		ParticipantRoutes(api)
+		// ParticipantRoutes(api)
 		BillRoutes(api)
 		ReceiptRoute(api)
 		ExchangeRateRoute(api)

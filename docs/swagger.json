@@ -11,9 +11,9 @@
     },
     "basePath": "/api/v1",
     "paths": {
-        "/bills": {
+        "/bills/assign-participants": {
             "post": {
-                "description": "Create a bill with participants and their items",
+                "description": "Assign participants to a bill and split item prices equally per participant",
                 "consumes": [
                     "application/json"
                 ],
@@ -23,42 +23,30 @@
                 "tags": [
                     "Bill"
                 ],
-                "summary": "Create a new bill",
+                "summary": "Assign participants to a bill",
                 "parameters": [
                     {
-                        "description": "Bill Info",
-                        "name": "bill",
+                        "description": "Assign Participants Request",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.CreateBillRequest"
+                            "$ref": "#/definitions/dtos.AssignParticipantsRequest"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Structured Assign Participants Result",
                         "schema": {
-                            "$ref": "#/definitions/dtos.CreateBillResponse"
+                            "$ref": "#/definitions/dtos.AssignParticipantsResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Invalid input"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
+                        "description": "Internal error"
                     }
                 }
             }
@@ -481,99 +469,6 @@
                 }
             }
         },
-        "/participants/{participant_id}": {
-            "get": {
-                "description": "Get participant all bills",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Participants"
-                ],
-                "summary": "Get participant Bills",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Participant ID",
-                        "name": "participant_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ParticipantDetailResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/participants/{participant_id}/{bill_id}": {
-            "get": {
-                "description": "Retrieve participant detail including bill and items using billId and participantId",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Participants"
-                ],
-                "summary": "Get participant detail in a bill",
-                "parameters": [
-                    {
-                        "description": "Bill and Participant IDs",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dtos.GetParticipantDetailRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ParticipantDetailResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/receipt/": {
             "post": {
                 "description": "Accepts a receipt image (PNG/JPEG) and get the detail.",
@@ -740,21 +635,24 @@
                 }
             }
         },
-        "dtos.CreateBillItemResponse": {
+        "dtos.AssignParticipantDetailRequest": {
             "type": "object",
             "properties": {
-                "itemId": {
-                    "type": "string"
+                "isPaid": {
+                    "type": "boolean"
                 },
-                "name": {
-                    "type": "string"
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.AssignParticipantItemRequest"
+                    }
                 },
-                "price": {
-                    "type": "integer"
+                "participantId": {
+                    "type": "string"
                 }
             }
         },
-        "dtos.CreateBillParticipantResponse": {
+        "dtos.AssignParticipantDetailResponse": {
             "type": "object",
             "properties": {
                 "amountOwed": {
@@ -766,7 +664,7 @@
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dtos.CreateBillItemResponse"
+                        "$ref": "#/definitions/dtos.AssignParticipantItemWithAmount"
                     }
                 },
                 "participantId": {
@@ -774,52 +672,50 @@
                 }
             }
         },
-        "dtos.CreateBillRequest": {
+        "dtos.AssignParticipantItemRequest": {
             "type": "object",
             "properties": {
-                "billTitle": {
-                    "type": "string",
-                    "example": "Dinner at Cafe"
-                },
-                "creatorId": {
-                    "type": "string",
-                    "example": "user123"
-                },
-                "participants": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dtos.CreateParticipantRequest"
-                    }
-                },
-                "totalAmount": {
-                    "type": "integer",
-                    "example": 200000
+                "itemId": {
+                    "type": "string"
                 }
             }
         },
-        "dtos.CreateBillResponse": {
+        "dtos.AssignParticipantItemWithAmount": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "itemId": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.AssignParticipantsRequest": {
             "type": "object",
             "properties": {
                 "billId": {
                     "type": "string"
                 },
-                "billTitle": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "creatorId": {
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.AssignParticipantDetailRequest"
+                    }
+                }
+            }
+        },
+        "dtos.AssignParticipantsResponse": {
+            "type": "object",
+            "properties": {
+                "billId": {
                     "type": "string"
                 },
                 "participants": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dtos.CreateBillParticipantResponse"
+                        "$ref": "#/definitions/dtos.AssignParticipantDetailResponse"
                     }
-                },
-                "totalAmount": {
-                    "type": "integer"
                 }
             }
         },
@@ -941,42 +837,6 @@
                 }
             }
         },
-        "dtos.CreateItemRequest": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "example": "Steak"
-                },
-                "price": {
-                    "type": "integer",
-                    "example": 80000
-                }
-            }
-        },
-        "dtos.CreateParticipantRequest": {
-            "type": "object",
-            "properties": {
-                "amountOwed": {
-                    "type": "integer",
-                    "example": 100000
-                },
-                "isPaid": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dtos.CreateItemRequest"
-                    }
-                },
-                "participantId": {
-                    "type": "string",
-                    "example": "user123"
-                }
-            }
-        },
         "dtos.DeclineFriendRequest": {
             "type": "object",
             "required": [
@@ -1088,47 +948,6 @@
                 }
             }
         },
-        "dtos.GetParticipantDetailRequest": {
-            "type": "object",
-            "required": [
-                "billId",
-                "participantId"
-            ],
-            "properties": {
-                "billId": {
-                    "type": "string"
-                },
-                "participantId": {
-                    "type": "string"
-                }
-            }
-        },
-        "dtos.ParticipantDetailResponse": {
-            "type": "object",
-            "properties": {
-                "billId": {
-                    "type": "string"
-                },
-                "billTitle": {
-                    "type": "string"
-                },
-                "creatorId": {
-                    "type": "string"
-                },
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Item"
-                    }
-                },
-                "participantId": {
-                    "type": "string"
-                },
-                "totalOwed": {
-                    "type": "integer"
-                }
-            }
-        },
         "dtos.ReceiptItem": {
             "type": "object",
             "properties": {
@@ -1194,29 +1013,6 @@
                 "data": {},
                 "message": {
                     "type": "string"
-                }
-            }
-        },
-        "models.Item": {
-            "type": "object",
-            "properties": {
-                "billId": {
-                    "type": "string"
-                },
-                "itemId": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "participantId": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "integer"
-                },
-                "quantity": {
-                    "type": "integer"
                 }
             }
         },

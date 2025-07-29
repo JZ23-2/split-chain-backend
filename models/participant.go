@@ -6,7 +6,7 @@ type Participant struct {
 	AmountOwed    int    `gorm:"type:int(10)" json:"amountOwed"`
 	IsPaid        bool   `json:"isPaid"`
 
-	Items []Item `gorm:"foreignKey:ParticipantID;references:ParticipantID"`
-	User  User   `gorm:"foreignKey:ParticipantID"`
-	Bill  Bill   `gorm:"foreignKey:BillID"`
+	ParticipantItem []ParticipantItem `gorm:"foreignKey:ParticipantID;references:ParticipantID" json:"participants"`
+	User            User              `gorm:"foreignKey:ParticipantID"`
+	Bill            Bill              `gorm:"foreignKey:BillID"`
 }

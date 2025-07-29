@@ -6,12 +6,13 @@ import (
 )
 
 type Item struct {
-	ItemID        string  `gorm:"primaryKey;type:varchar(255)" json:"itemId"`
-	ParticipantID *string `gorm:"type:varchar(255);default:null" json:"participantId"`
-	BillID        string  `gorm:"type:varchar(255)" json:"billId"`
-	Name          string  `gorm:"type:varchar(255)" json:"name"`
-	Quantity      int     `gorm:"type:int(10)" json:"quantity"`
-	Price         int     `gorm:"type:int(10)" json:"price"`
+	ItemID   string `gorm:"primaryKey;type:varchar(255)" json:"itemId"`
+	BillID   string `gorm:"type:varchar(255)" json:"billId"`
+	Name     string `gorm:"type:varchar(255)" json:"name"`
+	Quantity int    `gorm:"type:int(10)" json:"quantity"`
+	Price    int    `gorm:"type:int(10)" json:"price"`
+
+	ParticipantItem []ParticipantItem `gorm:"foreignKey:ItemID;references:ItemID" json:"items"`
 }
 
 func (i *Item) BeforeCreate(tx *gorm.DB) (err error) {

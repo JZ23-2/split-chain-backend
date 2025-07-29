@@ -42,16 +42,18 @@ definitions:
     - friend_wallet_address
     - user_wallet_address
     type: object
-  dtos.CreateBillItemResponse:
+  dtos.AssignParticipantDetailRequest:
     properties:
-      itemId:
+      isPaid:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/dtos.AssignParticipantItemRequest'
+        type: array
+      participantId:
         type: string
-      name:
-        type: string
-      price:
-        type: integer
     type: object
-  dtos.CreateBillParticipantResponse:
+  dtos.AssignParticipantDetailResponse:
     properties:
       amountOwed:
         type: integer
@@ -59,43 +61,40 @@ definitions:
         type: boolean
       items:
         items:
-          $ref: '#/definitions/dtos.CreateBillItemResponse'
+          $ref: '#/definitions/dtos.AssignParticipantItemWithAmount'
         type: array
       participantId:
         type: string
     type: object
-  dtos.CreateBillRequest:
+  dtos.AssignParticipantItemRequest:
     properties:
-      billTitle:
-        example: Dinner at Cafe
+      itemId:
         type: string
-      creatorId:
-        example: user123
-        type: string
-      participants:
-        items:
-          $ref: '#/definitions/dtos.CreateParticipantRequest'
-        type: array
-      totalAmount:
-        example: 200000
-        type: integer
     type: object
-  dtos.CreateBillResponse:
+  dtos.AssignParticipantItemWithAmount:
+    properties:
+      amount:
+        type: integer
+      itemId:
+        type: string
+    type: object
+  dtos.AssignParticipantsRequest:
     properties:
       billId:
         type: string
-      billTitle:
-        type: string
-      createdAt:
-        type: string
-      creatorId:
+      participants:
+        items:
+          $ref: '#/definitions/dtos.AssignParticipantDetailRequest'
+        type: array
+    type: object
+  dtos.AssignParticipantsResponse:
+    properties:
+      billId:
         type: string
       participants:
         items:
-          $ref: '#/definitions/dtos.CreateBillParticipantResponse'
+          $ref: '#/definitions/dtos.AssignParticipantDetailResponse'
         type: array
-      totalAmount:
-        type: integer
     type: object
   dtos.CreateBillWithoutParticipantItemRequest:
     properties:
@@ -178,31 +177,6 @@ definitions:
       totalAmount:
         type: integer
     type: object
-  dtos.CreateItemRequest:
-    properties:
-      name:
-        example: Steak
-        type: string
-      price:
-        example: 80000
-        type: integer
-    type: object
-  dtos.CreateParticipantRequest:
-    properties:
-      amountOwed:
-        example: 100000
-        type: integer
-      isPaid:
-        example: true
-        type: boolean
-      items:
-        items:
-          $ref: '#/definitions/dtos.CreateItemRequest'
-        type: array
-      participantId:
-        example: user123
-        type: string
-    type: object
   dtos.DeclineFriendRequest:
     properties:
       id:
@@ -276,33 +250,6 @@ definitions:
       totalAmount:
         type: integer
     type: object
-  dtos.GetParticipantDetailRequest:
-    properties:
-      billId:
-        type: string
-      participantId:
-        type: string
-    required:
-    - billId
-    - participantId
-    type: object
-  dtos.ParticipantDetailResponse:
-    properties:
-      billId:
-        type: string
-      billTitle:
-        type: string
-      creatorId:
-        type: string
-      items:
-        items:
-          $ref: '#/definitions/models.Item'
-        type: array
-      participantId:
-        type: string
-      totalOwed:
-        type: integer
-    type: object
   dtos.ReceiptItem:
     properties:
       name:
@@ -351,21 +298,6 @@ definitions:
       message:
         type: string
     type: object
-  models.Item:
-    properties:
-      billId:
-        type: string
-      itemId:
-        type: string
-      name:
-        type: string
-      participantId:
-        type: string
-      price:
-        type: integer
-      quantity:
-        type: integer
-    type: object
   models.User:
     properties:
       wallet_address:
@@ -378,38 +310,31 @@ info:
     name: MIT
   version: "1.0"
 paths:
-  /bills:
+  /bills/assign-participants:
     post:
       consumes:
       - application/json
-      description: Create a bill with participants and their items
+      description: Assign participants to a bill and split item prices equally per
+        participant
       parameters:
-      - description: Bill Info
+      - description: Assign Participants Request
         in: body
-        name: bill
+        name: request
         required: true
         schema:
-          $ref: '#/definitions/dtos.CreateBillRequest'
+          $ref: '#/definitions/dtos.AssignParticipantsRequest'
       produces:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Structured Assign Participants Result
           schema:
-            $ref: '#/definitions/dtos.CreateBillResponse'
+            $ref: '#/definitions/dtos.AssignParticipantsResponse'
         "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
+          description: Invalid input
         "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Create a new bill
+          description: Internal error
+      summary: Assign participants to a bill
       tags:
       - Bill
   /bills/bill-without-participant:
@@ -684,68 +609,6 @@ paths:
       summary: Get HBAR Rate (1 USD)
       tags:
       - Rate
-  /participants/{participant_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get participant all bills
-      parameters:
-      - description: Participant ID
-        in: path
-        name: participant_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.ParticipantDetailResponse'
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get participant Bills
-      tags:
-      - Participants
-  /participants/{participant_id}/{bill_id}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieve participant detail including bill and items using billId
-        and participantId
-      parameters:
-      - description: Bill and Participant IDs
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dtos.GetParticipantDetailRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.ParticipantDetailResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Get participant detail in a bill
-      tags:
-      - Participants
   /receipt/:
     post:
       consumes:
