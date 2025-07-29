@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -113,9 +114,7 @@ func CreateBillWithoutParticipant(c *gin.Context) {
 		return
 	}
 
-	billID := uuid.NewString()
 	bill := models.Bill{
-		BillID:      billID,
 		BillTitle:   req.StoreName,
 		TotalAmount: req.TotalAmount,
 		Tax:         req.Tax,
@@ -131,12 +130,12 @@ func CreateBillWithoutParticipant(c *gin.Context) {
 
 	var itemResponses []dtos.CreateBillWithoutParticipantItemResponse
 
+	fmt.Println("Bill ID: ", bill.BillID)
 	for _, item := range req.Items {
 		itemID := uuid.NewString()
-
 		newItem := models.Item{
 			ItemID:        itemID,
-			BillID:        billID,
+			BillID:        bill.BillID,
 			ParticipantID: nil,
 			Name:          item.Name,
 			Price:         item.UnitPrice,
@@ -159,7 +158,7 @@ func CreateBillWithoutParticipant(c *gin.Context) {
 	}
 
 	resp := dtos.CreateBillWithoutParticipantResponse{
-		BillID:      billID,
+		BillID:      bill.BillID,
 		StoreName:   req.StoreName,
 		Date:        req.Date,
 		Tax:         req.Tax,

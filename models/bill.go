@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -22,5 +23,6 @@ type Bill struct {
 
 func (b *Bill) BeforeCreate(tx *gorm.DB) (err error) {
 	b.BillID = uuid.NewString()
+	fmt.Println(b.BillID)
 	return
 }
