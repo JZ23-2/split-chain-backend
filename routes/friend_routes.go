@@ -13,5 +13,6 @@ func FriendRoutes(api *gin.RouterGroup) {
 		friend.POST("/add", controllers.AddFriend)
 		friend.GET("/:user_wallet_address", controllers.GetFriend)
 		friend.POST("/alias", controllers.AddFriendNickname)
+		friend.GET("/get-pending-request/:user_wallet_address", controllers.GetPendingFriendRequest)
 	}
 }

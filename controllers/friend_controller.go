@@ -1,13 +1,14 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 
-	"github.com/JZ23-2/splitbill-backend/database"
 	"github.com/JZ23-2/splitbill-backend/dtos"
-	"github.com/JZ23-2/splitbill-backend/models"
+	"github.com/JZ23-2/splitbill-backend/services"
 	"github.com/JZ23-2/splitbill-backend/utils"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // AcceptFriendRequest godoc
@@ -34,47 +35,15 @@ func AcceptFriendRequest(c *gin.Context) {
 		return
 	}
 
-	var pending models.PendingFriendRequest
-	if err := database.DB.First(&pending, "id = ?", req.ID).Error; err != nil {
-		utils.FailedResponse(c, http.StatusNotFound, "Not Found")
+	friend1Resp, friend2Resp, err := services.AcceptFriendRequestService(req)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			utils.FailedResponse(c, http.StatusNotFound, "Friend request not found")
+		} else {
+			utils.FailedResponse(c, http.StatusInternalServerError, "Failed to accept friend request")
+		}
 		return
 	}
-
-	friend1 := models.Friend{
-		UserWalletAddress:   pending.FriendWalletAddress,
-		FriendWalletAddress: pending.UserWalletAddress,
-	}
-
-	friend2 := models.Friend{
-		UserWalletAddress:   pending.UserWalletAddress,
-		FriendWalletAddress: pending.FriendWalletAddress,
-	}
-
-	if err := database.DB.Create(&friend1).Error; err != nil {
-		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to create friends")
-		return
-	}
-
-	if err := database.DB.Create(&friend2).Error; err != nil {
-		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to create friends")
-		return
-	}
-
-	friend1Resp := dtos.AcceptFriendResponse{
-		ID:                  friend1.ID,
-		UserWalletAddress:   friend1.UserWalletAddress,
-		FriendWalletAddress: friend1.FriendWalletAddress,
-		Nickname:            &friend1.Nickname,
-	}
-
-	friend2Resp := dtos.AcceptFriendResponse{
-		ID:                  friend2.ID,
-		UserWalletAddress:   friend2.UserWalletAddress,
-		FriendWalletAddress: friend2.FriendWalletAddress,
-		Nickname:            &friend2.Nickname,
-	}
-
-	database.DB.Delete(&pending)
 
 	utils.SuccessResponse(c, http.StatusOK, "Friend Request Accepted", gin.H{
 		"friend_1": friend1Resp,
@@ -105,23 +74,14 @@ func DeclineFriendRequest(c *gin.Context) {
 		return
 	}
 
-	var pending models.PendingFriendRequest
-	if err := database.DB.First(&pending, "id = ?", req.ID).Error; err != nil {
-		utils.FailedResponse(c, http.StatusNotFound, "Not Found")
+	response, err := services.DeclineFriendRequestService(req)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			utils.FailedResponse(c, http.StatusNotFound, "Friend request not found")
+		} else {
+			utils.FailedResponse(c, http.StatusInternalServerError, "Failed to decline friend request")
+		}
 		return
-	}
-
-	pending.Status = "Declined"
-	if err := database.DB.Save(&pending).Error; err != nil {
-		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to decline friend request")
-		return
-	}
-
-	response := dtos.DeclineFriendResponse{
-		ID:                  pending.ID,
-		UserWalletAddress:   pending.UserWalletAddress,
-		FriendWalletAddress: pending.FriendWalletAddress,
-		Status:              pending.Status,
 	}
 
 	utils.SuccessResponse(c, http.StatusOK, "Friend request declined", response)
@@ -150,108 +110,13 @@ func AddFriend(c *gin.Context) {
 		return
 	}
 
-	var user, friend models.User
-	if err := database.DB.First(&user, "wallet_address = ?", req.UserWalletAddress).Error; err != nil {
-		utils.FailedResponse(c, http.StatusNotFound, "User Not Found")
+	result, message, statusCode, err := services.AddFriendRequestService(req)
+	if err != nil {
+		utils.FailedResponse(c, statusCode, message)
 		return
 	}
 
-	if err := database.DB.First(&friend, "wallet_address = ?", req.FriendWalletAddress).Error; err != nil {
-		utils.FailedResponse(c, http.StatusNotFound, "Friend Not Found")
-		return
-	}
-
-	var existing models.PendingFriendRequest
-	if err := database.DB.Where("user_wallet_address = ? AND friend_wallet_address = ? AND status = ?", req.UserWalletAddress, req.FriendWalletAddress, "Declined").First(&existing).Error; err == nil {
-		existing.Status = "Pending"
-		if err := database.DB.Save(&existing).Error; err != nil {
-			utils.FailedResponse(c, http.StatusInternalServerError, "Failed")
-			return
-		}
-		utils.SuccessResponse(c, http.StatusOK, "Successfully Added Friend Request", existing)
-		return
-	}
-
-	if err := database.DB.Where(
-		"(user_wallet_address = ? AND friend_wallet_address = ?) OR (user_wallet_address = ? AND friend_wallet_address = ?)",
-		req.UserWalletAddress, req.FriendWalletAddress,
-		req.FriendWalletAddress, req.UserWalletAddress,
-	).First(&existing).Error; err == nil {
-		friend1 := models.Friend{
-			UserWalletAddress:   req.FriendWalletAddress,
-			FriendWalletAddress: req.UserWalletAddress,
-		}
-
-		friend2 := models.Friend{
-			UserWalletAddress:   req.UserWalletAddress,
-			FriendWalletAddress: req.FriendWalletAddress,
-		}
-
-		if err := database.DB.Create(&friend1).Error; err != nil {
-			utils.FailedResponse(c, http.StatusInternalServerError, "Failed to create friends")
-			return
-		}
-
-		if err := database.DB.Create(&friend2).Error; err != nil {
-			utils.FailedResponse(c, http.StatusInternalServerError, "Failed to create friends")
-			return
-		}
-
-		friend1Resp := dtos.AcceptFriendResponse{
-			ID:                  friend1.ID,
-			UserWalletAddress:   friend1.UserWalletAddress,
-			FriendWalletAddress: friend1.FriendWalletAddress,
-			Nickname:            &friend1.Nickname,
-		}
-
-		friend2Resp := dtos.AcceptFriendResponse{
-			ID:                  friend2.ID,
-			UserWalletAddress:   friend2.UserWalletAddress,
-			FriendWalletAddress: friend2.FriendWalletAddress,
-			Nickname:            &friend2.Nickname,
-		}
-
-		if err := database.DB.Where(
-			"(user_wallet_address = ? AND friend_wallet_address = ?) OR (user_wallet_address = ? AND friend_wallet_address = ?)",
-			req.UserWalletAddress, req.FriendWalletAddress,
-			req.FriendWalletAddress, req.UserWalletAddress,
-		).Delete(&models.PendingFriendRequest{}).Error; err != nil {
-			utils.FailedResponse(c, http.StatusInternalServerError, "Failed to delete pending requests")
-			return
-		}
-
-		utils.SuccessResponse(c, http.StatusOK, "Friend Request Accepted", gin.H{
-			"friend_1": friend1Resp,
-			"friend_2": friend2Resp,
-		})
-
-		return
-	}
-
-	var friendCheck models.Friend
-	if err := database.DB.Where("user_wallet_address = ? AND friend_wallet_address = ?", req.UserWalletAddress, req.FriendWalletAddress).First(&friendCheck).Error; err == nil {
-		utils.FailedResponse(c, http.StatusConflict, "Already Friend")
-		return
-	}
-
-	newRequest := models.PendingFriendRequest{
-		UserWalletAddress:   req.UserWalletAddress,
-		FriendWalletAddress: req.FriendWalletAddress,
-	}
-
-	if err := database.DB.Create(&newRequest).Error; err != nil {
-		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to create friend request")
-		return
-	}
-
-	response := dtos.AddFriendResponse{
-		ID:                  newRequest.ID,
-		UserWalletAddress:   newRequest.UserWalletAddress,
-		FriendWalletAddress: newRequest.FriendWalletAddress,
-		Status:              "Pending",
-	}
-
-	utils.SuccessResponse(c, http.StatusOK, "Successfully Added Friend Request", response)
+	utils.SuccessResponse(c, statusCode, message, result)
 }
 
 // FetchFriend godoc
@@ -272,14 +137,8 @@ func AddFriend(c *gin.Context) {
 //	@Router		/friends/{user_wallet_address} [get]
 func GetFriend(c *gin.Context) {
 	userWalletAddress := c.Param("user_wallet_address")
-	var friends []dtos.FriendResponse
 
-	err := database.DB.
-		Table("friends").
-		Select("id, nickname, friend_wallet_address").
-		Where("user_wallet_address = ?", userWalletAddress).
-		Find(&friends).Error
-
+	friends, err := services.GetFriendService(userWalletAddress)
 	if err != nil {
 		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to fetch friends")
 		return
@@ -312,28 +171,45 @@ func AddFriendNickname(c *gin.Context) {
 		return
 	}
 
-	var friend models.Friend
-
-	err := database.DB.
-		Where("user_wallet_address = ? AND friend_wallet_address = ?", req.UserWalletAddress, req.FriendWalletAddress).
-		First(&friend).Error
-
+	res, err := services.AddFriendNicknameService(req)
 	if err != nil {
-		utils.FailedResponse(c, http.StatusNotFound, "User or Friend Not Found")
+		if err.Error() == "user or friend not found" {
+			utils.FailedResponse(c, http.StatusNotFound, err.Error())
+			return
+		}
+		utils.FailedResponse(c, http.StatusInternalServerError, err.Error())
 		return
-	}
-
-	friend.Nickname = *req.Nickname
-	if err := database.DB.Save(&friend).Error; err != nil {
-		utils.FailedResponse(c, http.StatusInternalServerError, "Failed to update nickname")
-		return
-	}
-
-	res := dtos.FriendResponse{
-		ID:                  friend.ID,
-		FriendWalletAddress: friend.FriendWalletAddress,
-		Nickname:            &friend.Nickname,
 	}
 
 	utils.SuccessResponse(c, http.StatusOK, "Nickname updated", res)
+}
+
+// GetPendingFriendRequest godoc
+//
+//	@Summary	Get pending friend request by user wallet address
+//
+// Description get pending friend request by user wallet address
+//
+//	@Tags		Friend
+//	@Accept		json
+//	@Produce	json
+//	@Param		user_wallet_address	path string true "user wallet addres"
+//	@Success	200		{object}	dtos.PendingFriendResponse
+//	@Failure	400		"Invalid Request"
+//	@Failure	500		"Internal Server Error"
+//	@Router		/friends/get-pending-request/{user_wallet_address} [get]
+func GetPendingFriendRequest(c *gin.Context) {
+	userWalletAddress := c.Param("user_wallet_address")
+
+	res, err := services.GetPendingFriendRequestService(userWalletAddress)
+	if err != nil {
+		if err.Error() == "invalid request" {
+			utils.FailedResponse(c, http.StatusBadRequest, err.Error())
+		} else {
+			utils.FailedResponse(c, http.StatusInternalServerError, "Failed to fetch pending friend request")
+		}
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Success fetch pending friend request", res)
 }

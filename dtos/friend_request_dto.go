@@ -33,3 +33,10 @@ type DeclineFriendResponse struct {
 	FriendWalletAddress string `json:"friend_wallet_address" binding:"required"`
 	Status              string `json:"status"`
 }
+
+type PendingFriendResponse struct {
+	ID                  string `json:"id"`
+	UserWalletAddress   string `json:"user_wallet_address"`
+	FriendWalletAddress string `json:"friend_wallet_address"`
+	Status              string `json:"status"`
+}

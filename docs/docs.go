@@ -405,6 +405,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/friends/get-pending-request/{user_wallet_address}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Friend"
+                ],
+                "summary": "Get pending friend request by user wallet address",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user wallet addres",
+                        "name": "user_wallet_address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.PendingFriendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/friends/{user_wallet_address}": {
             "get": {
                 "consumes": [
@@ -954,6 +991,23 @@ const docTemplate = `{
                 },
                 "totalAmount": {
                     "type": "integer"
+                }
+            }
+        },
+        "dtos.PendingFriendResponse": {
+            "type": "object",
+            "properties": {
+                "friend_wallet_address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "user_wallet_address": {
+                    "type": "string"
                 }
             }
         },

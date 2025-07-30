@@ -250,6 +250,17 @@ definitions:
       totalAmount:
         type: integer
     type: object
+  dtos.PendingFriendResponse:
+    properties:
+      friend_wallet_address:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+      user_wallet_address:
+        type: string
+    type: object
   dtos.ReceiptItem:
     properties:
       name:
@@ -587,6 +598,30 @@ paths:
         "500":
           description: Internal Server Error
       summary: Decline friend request
+      tags:
+      - Friend
+  /friends/get-pending-request/{user_wallet_address}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: user wallet addres
+        in: path
+        name: user_wallet_address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.PendingFriendResponse'
+        "400":
+          description: Invalid Request
+        "500":
+          description: Internal Server Error
+      summary: Get pending friend request by user wallet address
       tags:
       - Friend
   /get-rate:
