@@ -848,9 +848,6 @@
                 "price": {
                     "type": "integer"
                 },
-                "priceAfterTax": {
-                    "type": "integer"
-                },
                 "quantity": {
                     "type": "integer"
                 }
@@ -859,17 +856,13 @@
         "dtos.CreateBillWithoutParticipantRequest": {
             "type": "object",
             "properties": {
-                "billTitle": {
+                "billDate": {
                     "type": "string",
-                    "example": "Makan orang hitam bersama"
+                    "example": "2019-11-02"
                 },
                 "creatorId": {
                     "type": "string",
                     "example": "user123"
-                },
-                "date": {
-                    "type": "string",
-                    "example": "2019-11-02"
                 },
                 "items": {
                     "type": "array",
@@ -888,10 +881,6 @@
                 "tax": {
                     "type": "number",
                     "example": 9.06
-                },
-                "totalAmount": {
-                    "type": "integer",
-                    "example": 15406
                 }
             }
         },
@@ -899,9 +888,6 @@
             "type": "object",
             "properties": {
                 "billId": {
-                    "type": "string"
-                },
-                "billTitle": {
                     "type": "string"
                 },
                 "createdAt": {
@@ -919,20 +905,11 @@
                         "$ref": "#/definitions/dtos.CreateBillWithoutParticipantItemResponse"
                     }
                 },
-                "service": {
-                    "type": "number"
-                },
                 "storeName": {
                     "type": "string"
                 },
                 "tax": {
                     "type": "number"
-                },
-                "totalAmount": {
-                    "type": "integer"
-                },
-                "totalAmountAfterTax": {
-                    "type": "integer"
                 }
             }
         },
@@ -1018,13 +995,27 @@
                 }
             }
         },
+        "dtos.GetBillByCreatorParticipantResponse": {
+            "type": "object",
+            "properties": {
+                "amountOwed": {
+                    "type": "integer"
+                },
+                "isPaid": {
+                    "type": "boolean"
+                },
+                "participantId": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.GetBillByCreatorResponse": {
             "type": "object",
             "properties": {
-                "billId": {
+                "billDate": {
                     "type": "string"
                 },
-                "billTitle": {
+                "billId": {
                     "type": "string"
                 },
                 "createdAt": {
@@ -1036,24 +1027,30 @@
                         "$ref": "#/definitions/dtos.GetBillByCreatorItemResponse"
                     }
                 },
-                "service": {
-                    "type": "number"
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.GetBillByCreatorParticipantResponse"
+                    }
+                },
+                "storeName": {
+                    "type": "string"
                 },
                 "tax": {
                     "type": "number"
-                },
-                "totalAmount": {
-                    "type": "integer"
                 }
             }
         },
         "dtos.ParticipantBillResponse": {
             "type": "object",
             "properties": {
+                "billDate": {
+                    "type": "string"
+                },
                 "billId": {
                     "type": "string"
                 },
-                "billTitle": {
+                "createdAt": {
                     "type": "string"
                 },
                 "creatorId": {
@@ -1071,14 +1068,11 @@
                         "$ref": "#/definitions/dtos.ParticipantListResponse"
                     }
                 },
-                "service": {
-                    "type": "number"
+                "storeName": {
+                    "type": "string"
                 },
                 "tax": {
                     "type": "number"
-                },
-                "totalAmount": {
-                    "type": "integer"
                 }
             }
         },
@@ -1092,9 +1086,6 @@
                     "type": "string"
                 },
                 "price": {
-                    "type": "integer"
-                },
-                "priceAfterTax": {
                     "type": "integer"
                 },
                 "quantity": {
@@ -1153,7 +1144,7 @@
         "dtos.ReceiptResponse": {
             "type": "object",
             "properties": {
-                "date": {
+                "billDate": {
                     "type": "string",
                     "example": "2025-10-02"
                 },
@@ -1173,10 +1164,6 @@
                 "tax": {
                     "type": "number",
                     "example": 9.1
-                },
-                "totalAmount": {
-                    "type": "number",
-                    "example": 15.4
                 }
             }
         },

@@ -1,7 +1,7 @@
 Extract structured info from this receipt image and return JSON only in this format:
 {
   "storeName": string,
-  "date": "YYYY-MM-DD",
+  "billDate": "YYYY-MM-DD",
   "items": [
     {
       "name": string,
@@ -11,6 +11,5 @@ Extract structured info from this receipt image and return JSON only in this for
   ],
   "tax": float,
   "service": float
-  "totalAmount": int
 }
 Only respond with JSON. Use null if any value is unclear.

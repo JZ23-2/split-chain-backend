@@ -93,21 +93,16 @@ definitions:
         type: string
       price:
         type: integer
-      priceAfterTax:
-        type: integer
       quantity:
         type: integer
     type: object
   dtos.CreateBillWithoutParticipantRequest:
     properties:
-      billTitle:
-        example: Makan orang hitam bersama
+      billDate:
+        example: "2019-11-02"
         type: string
       creatorId:
         example: user123
-        type: string
-      date:
-        example: "2019-11-02"
         type: string
       items:
         items:
@@ -122,15 +117,10 @@ definitions:
       tax:
         example: 9.06
         type: number
-      totalAmount:
-        example: 15406
-        type: integer
     type: object
   dtos.CreateBillWithoutParticipantResponse:
     properties:
       billId:
-        type: string
-      billTitle:
         type: string
       createdAt:
         type: string
@@ -142,16 +132,10 @@ definitions:
         items:
           $ref: '#/definitions/dtos.CreateBillWithoutParticipantItemResponse'
         type: array
-      service:
-        type: number
       storeName:
         type: string
       tax:
         type: number
-      totalAmount:
-        type: integer
-      totalAmountAfterTax:
-        type: integer
     type: object
   dtos.DeclineFriendRequest:
     properties:
@@ -207,11 +191,20 @@ definitions:
       quantity:
         type: integer
     type: object
+  dtos.GetBillByCreatorParticipantResponse:
+    properties:
+      amountOwed:
+        type: integer
+      isPaid:
+        type: boolean
+      participantId:
+        type: string
+    type: object
   dtos.GetBillByCreatorResponse:
     properties:
-      billId:
+      billDate:
         type: string
-      billTitle:
+      billId:
         type: string
       createdAt:
         type: string
@@ -219,18 +212,22 @@ definitions:
         items:
           $ref: '#/definitions/dtos.GetBillByCreatorItemResponse'
         type: array
-      service:
-        type: number
+      participants:
+        items:
+          $ref: '#/definitions/dtos.GetBillByCreatorParticipantResponse'
+        type: array
+      storeName:
+        type: string
       tax:
         type: number
-      totalAmount:
-        type: integer
     type: object
   dtos.ParticipantBillResponse:
     properties:
+      billDate:
+        type: string
       billId:
         type: string
-      billTitle:
+      createdAt:
         type: string
       creatorId:
         type: string
@@ -242,12 +239,10 @@ definitions:
         items:
           $ref: '#/definitions/dtos.ParticipantListResponse'
         type: array
-      service:
-        type: number
+      storeName:
+        type: string
       tax:
         type: number
-      totalAmount:
-        type: integer
     type: object
   dtos.ParticipantItemResponse:
     properties:
@@ -256,8 +251,6 @@ definitions:
       name:
         type: string
       price:
-        type: integer
-      priceAfterTax:
         type: integer
       quantity:
         type: integer
@@ -296,7 +289,7 @@ definitions:
     type: object
   dtos.ReceiptResponse:
     properties:
-      date:
+      billDate:
         example: "2025-10-02"
         type: string
       items:
@@ -310,9 +303,6 @@ definitions:
         type: string
       tax:
         example: 9.1
-        type: number
-      totalAmount:
-        example: 15.4
         type: number
     type: object
   dtos.SuccessResponse:
