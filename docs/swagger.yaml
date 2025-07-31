@@ -621,7 +621,7 @@ paths:
           description: Invalid Request
         "500":
           description: Internal Server Error
-      summary: Get pending friend request by friend wallet address
+      summary: Get pending & declined friend request by friend wallet address
       tags:
       - Friend
   /friends/get-pending-request/{user_wallet_address}:
@@ -645,7 +645,7 @@ paths:
           description: Invalid Request
         "500":
           description: Internal Server Error
-      summary: Get pending friend request by user wallet address
+      summary: Get pending & declined friend request by user wallet address
       tags:
       - Friend
   /get-rate:

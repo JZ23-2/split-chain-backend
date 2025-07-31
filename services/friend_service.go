@@ -224,7 +224,7 @@ func GetPendingFriendRequestService(userWalletAddress string) ([]dtos.PendingFri
 
 	var pendingRequests []models.PendingFriendRequest
 	err := database.DB.
-		Where("user_wallet_address = ? AND status = ?", userWalletAddress, "Pending").
+		Where("user_wallet_address = ? AND (status = ? OR status = ?)", userWalletAddress, "Pending", "Declined").
 		Find(&pendingRequests).Error
 
 	if err != nil {
@@ -256,7 +256,7 @@ func GetPendingFriendRequestServiceRequestedUser(friendWalletAddress string) ([]
 
 	var pendingRequests []models.PendingFriendRequest
 	err := database.DB.
-		Where("friend_wallet_address = ? AND status = ?", friendWalletAddress, "Pending").
+		Where("friend_wallet_address = ? AND (status = ? OR status = ?)", friendWalletAddress, "Pending", "Declined").
 		Find(&pendingRequests).Error
 
 	if err != nil {

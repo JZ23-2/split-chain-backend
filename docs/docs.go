@@ -416,7 +416,7 @@ const docTemplate = `{
                 "tags": [
                     "Friend"
                 ],
-                "summary": "Get pending friend request by friend wallet address",
+                "summary": "Get pending \u0026 declined friend request by friend wallet address",
                 "parameters": [
                     {
                         "type": "string",
@@ -453,7 +453,7 @@ const docTemplate = `{
                 "tags": [
                     "Friend"
                 ],
-                "summary": "Get pending friend request by user wallet address",
+                "summary": "Get pending \u0026 declined friend request by user wallet address",
                 "parameters": [
                     {
                         "type": "string",

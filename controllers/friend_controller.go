@@ -186,9 +186,9 @@ func AddFriendNickname(c *gin.Context) {
 
 // GetPendingFriendRequest godoc
 //
-//	@Summary	Get pending friend request by user wallet address
+//	@Summary	Get pending & declined friend request by user wallet address
 //
-// Description get pending friend request by user wallet address
+// Description get pending & declined friend request by user wallet address
 //
 //	@Tags		Friend
 //	@Accept		json
@@ -216,9 +216,9 @@ func GetPendingFriendRequest(c *gin.Context) {
 
 // GetPendingFriendRequestByFriendWalletAddress godoc
 //
-//	@Summary	Get pending friend request by friend wallet address
+//	@Summary	Get pending & declined friend request by friend wallet address
 //
-// Description get pending friend request by friend wallet address
+// Description get pending & declined friend request by friend wallet address
 //
 //	@Tags		Friend
 //	@Accept		json
