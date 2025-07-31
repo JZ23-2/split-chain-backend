@@ -6,12 +6,11 @@ Extract structured info from this receipt image and return JSON only in this for
     {
       "name": string,
       "quantity": int,
-      "unitPrice": float,
-      "totalPrice": float
+      "price": int,
     }
   ],
   "tax": float,
   "service": float
-  "totalAmount": float
+  "totalAmount": int
 }
 Only respond with JSON. Use null if any value is unclear.

@@ -82,14 +82,5 @@ func SendToGemini(file io.Reader) (*dtos.ReceiptResponse, error) {
 		return nil, fmt.Errorf("failed to parse JSON from gemini response: %v", err)
 	}
 
-	sumTotal := receipt.TotalAmount
-
-	for i := range receipt.Items {
-		proportion := receipt.Items[i].TotalPrice / sumTotal
-		taxProportion := proportion * receipt.Tax
-		receipt.Items[i].PriceAfterTax = receipt.Items[i].TotalPrice + taxProportion
-		receipt.Items[i].PriceInHBAR = 0
-	}
-
 	return &receipt, nil
 }

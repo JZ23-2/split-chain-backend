@@ -9,36 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AssignParticipantsToBill assigns participants to a bill and splits item prices equally among them.
-// @Summary Assign participants to a bill
-// @Description Assign participants to a bill and split item prices equally per participant
-// @Tags Bill
-// @Accept json
-// @Produce json
-// @Param request body dtos.AssignParticipantsRequest true "Assign Participants Request"
-// @Success 201 {object} dtos.AssignParticipantsResponse "Structured Assign Participants Result"
-// @Failure		400		"Invalid input"
-//
-//	@Failure		500		"Internal error"
-//
-// @Router /bills/assign-participants [post]
-func AssignParticipantsController(c *gin.Context) {
-	var req dtos.AssignParticipantsRequest
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.FailedResponse(c, http.StatusBadRequest, "Invalid request: "+err.Error())
-		return
-	}
-
-	resp, err := services.AssignParticipantToBill(req)
-	if err != nil {
-		utils.FailedResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	utils.SuccessResponse(c, http.StatusCreated, "Participants assigned successfully", resp)
-}
-
 // CreateBillWithoutParticipant godoc
 // @Summary      Create bill (no participants)
 // @Description  Save a bill with items, tax, and service, without splitting between participants
@@ -95,4 +65,62 @@ func GetBillByCreatorController(c *gin.Context) {
 	}
 
 	utils.SuccessResponse(c, http.StatusOK, "Bill fetched", resp)
+}
+
+// AssignParticipantToItem godoc
+//
+//	@Summary		Assign Participant To Item
+//	@Description	Assign Participant To Item
+//	@Tags			Bill
+//	@Accept			json
+//	@Produce		json
+//
+// @Param        bill  body      dtos.AssignParticipantsRequest  true  "Participants"
+//
+// @Success      200   {object}  dtos.AssignedParticipantResponse
+//
+//	@Failure		400			{object}	map[string]string
+//	@Failure		500			{object}	map[string]string
+//	@Router			/bills/assign-participants [post]
+func AssignParticipantController(c *gin.Context) {
+	var req dtos.AssignParticipantsRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request: " + err.Error()})
+		return
+	}
+
+	resp, err := services.AssignParticipantsToItem(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+// GetBillsByParticipantHandler godoc
+// @Summary      Get bills by participant ID
+// @Description  Get bills by participant ID
+// @Tags         Bill
+// @Param        participantId path string true "Participant ID"
+// @Produce      json
+// @Success      200 {array} dtos.ParticipantBillResponse
+// @Failure      400 {object} map[string]string "Bad Request"
+// @Failure      500 {object} map[string]string "Internal Server Error"
+// @Router       /bills/by-participant/{participantId} [get]
+func GetBillsByParticipantController(c *gin.Context) {
+	participantID := c.Param("participantId")
+	if participantID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "participantId is required"})
+		return
+	}
+
+	bills, err := services.GetBillsByParticipantID(participantID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, bills)
 }

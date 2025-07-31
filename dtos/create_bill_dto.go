@@ -42,14 +42,13 @@ type CreateBillItemResponse struct {
 }
 
 type CreateBillWithoutParticipantItemRequest struct {
-	Name          string  `json:"name" example:"Steak"`
-	Quantity      int     `json:"quantity" example:"2"`
-	UnitPrice     int     `json:"price" example:"40000"`
-	PriceAfterTax float64 `json:"priceAfterTax" example:"87200.00"`
-	PriceInHBAR   float64 `json:"priceInHBAR" example:"0.00"`
+	Name     string `json:"name" example:"Steak"`
+	Quantity int    `json:"quantity" example:"2"`
+	Price    int    `json:"price" example:"40000"`
 }
 
 type CreateBillWithoutParticipantRequest struct {
+	BillTitle   string                                    `json:"billTitle" example:"Makan orang hitam bersama"`
 	StoreName   string                                    `json:"storeName" example:"East Repair Inc."`
 	Date        string                                    `json:"date" example:"2019-11-02"`
 	Tax         float32                                   `json:"tax" example:"9.06"`
@@ -60,24 +59,25 @@ type CreateBillWithoutParticipantRequest struct {
 }
 
 type CreateBillWithoutParticipantItemResponse struct {
-	ItemID        string  `json:"itemId"`
-	Name          string  `json:"name"`
-	Quantity      int     `json:"quantity"`
-	UnitPrice     int     `json:"price"`
-	PriceAfterTax float64 `json:"priceAfterTax"`
-	PriceInHBAR   float64 `json:"priceInHBAR"`
+	ItemID        string `json:"itemId"`
+	Name          string `json:"name"`
+	Quantity      int    `json:"quantity"`
+	UnitPrice     int    `json:"price"`
+	PriceAfterTax int    `json:"priceAfterTax"`
 }
 
 type CreateBillWithoutParticipantResponse struct {
-	BillID      string                                     `json:"billId"`
-	StoreName   string                                     `json:"storeName"`
-	Date        string                                     `json:"date"`
-	Tax         float32                                    `json:"tax"`
-	Service     float32                                    `json:"service"`
-	TotalAmount int                                        `json:"totalAmount"`
-	CreatedAt   string                                     `json:"createdAt"`
-	CreatorID   string                                     `json:"creatorId"`
-	Items       []CreateBillWithoutParticipantItemResponse `json:"items"`
+	BillID              string                                     `json:"billId"`
+	BillTitle           string                                     `json:"billTitle"`
+	StoreName           string                                     `json:"storeName"`
+	Date                string                                     `json:"date"`
+	Tax                 float32                                    `json:"tax"`
+	Service             float32                                    `json:"service"`
+	TotalAmount         int                                        `json:"totalAmount"`
+	TotalAmountAfterTax int                                        `json:"totalAmountAfterTax"`
+	CreatedAt           string                                     `json:"createdAt"`
+	CreatorID           string                                     `json:"creatorId"`
+	Items               []CreateBillWithoutParticipantItemResponse `json:"items"`
 }
 
 type GetBillByCreatorItemResponse struct {
@@ -91,8 +91,8 @@ type GetBillByCreatorResponse struct {
 	BillID      string                         `json:"billId"`
 	BillTitle   string                         `json:"billTitle"`
 	TotalAmount int                            `json:"totalAmount"`
-	Tax         float32                            `json:"tax"`
-	Service     float32                            `json:"service"`
+	Tax         float32                        `json:"tax"`
+	Service     float32                        `json:"service"`
 	CreatedAt   string                         `json:"createdAt"`
 	Items       []GetBillByCreatorItemResponse `json:"items"`
 }

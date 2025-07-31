@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"math"
 	"time"
 
 	"github.com/JZ23-2/splitbill-backend/database"
@@ -10,100 +11,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func AssignParticipantToBill(req dtos.AssignParticipantsRequest) (*dtos.AssignParticipantsResponse, error) {
-	itemToParticipants := make(map[string][]string)
-	for _, p := range req.Participants {
-		for _, item := range p.Items {
-			itemToParticipants[item.ItemID] = append(itemToParticipants[item.ItemID], p.ParticipantID)
-		}
-	}
-
-	itemIDs := keys(itemToParticipants)
-	var items []models.Item
-	if err := database.DB.Where("item_id IN ?", itemIDs).Find(&items).Error; err != nil {
-		return nil, errors.New("failed to fetch items: " + err.Error())
-	}
-
-	itemPriceMap := make(map[string]int)
-	for _, item := range items {
-		itemPriceMap[item.ItemID] = item.Price
-	}
-
-	var responseParticipants []dtos.AssignParticipantDetailResponse
-
-	for _, p := range req.Participants {
-		participant := models.Participant{
-			ParticipantID: p.ParticipantID,
-			BillID:        req.BillID,
-			IsPaid:        p.IsPaid,
-		}
-
-		if err := database.DB.Create(&participant).Error; err != nil {
-			return nil, errors.New("failed to create participant: " + err.Error())
-		}
-
-		totalOwed := 0
-		var responseItems []dtos.AssignParticipantItemWithAmount
-
-		for _, item := range p.Items {
-			price := itemPriceMap[item.ItemID]
-			numParticipants := len(itemToParticipants[item.ItemID])
-			if numParticipants == 0 {
-				return nil, errors.New("no participants for item: " + item.ItemID)
-			}
-
-			share := price / numParticipants
-			totalOwed += share
-
-			participantItem := models.ParticipantItem{
-				ParticipantID: p.ParticipantID,
-				ItemID:        item.ItemID,
-				Amount:        share,
-			}
-
-			if err := database.DB.Create(&participantItem).Error; err != nil {
-				return nil, errors.New("failed to create participant item: " + err.Error())
-			}
-
-			responseItems = append(responseItems, dtos.AssignParticipantItemWithAmount{
-				ItemID: item.ItemID,
-				Amount: share,
-			})
-		}
-
-		if err := database.DB.Model(&models.Participant{}).
-			Where("participant_id = ? AND bill_id = ?", p.ParticipantID, req.BillID).
-			Update("amount_owed", totalOwed).Error; err != nil {
-			return nil, errors.New("failed to update amount owed: " + err.Error())
-		}
-
-		responseParticipants = append(responseParticipants, dtos.AssignParticipantDetailResponse{
-			ParticipantID: p.ParticipantID,
-			IsPaid:        p.IsPaid,
-			AmountOwed:    totalOwed,
-			Items:         responseItems,
-		})
-	}
-
-	resp := &dtos.AssignParticipantsResponse{
-		BillID:       req.BillID,
-		Participants: responseParticipants,
-	}
-
-	return resp, nil
-}
-
-func keys(m map[string][]string) []string {
-	var out []string
-	for k := range m {
-		out = append(out, k)
-	}
-	return out
-}
-
 func CreateBillWithoutParticipant(req dtos.CreateBillWithoutParticipantRequest) (*dtos.CreateBillWithoutParticipantResponse, error) {
 	bill := models.Bill{
-		BillTitle:   req.StoreName,
+		BillTitle:   req.BillTitle,
+		StoreName:   req.StoreName,
 		TotalAmount: req.TotalAmount,
 		Tax:         req.Tax,
 		Service:     req.Service,
@@ -116,15 +27,25 @@ func CreateBillWithoutParticipant(req dtos.CreateBillWithoutParticipantRequest) 
 	}
 
 	var itemResponses []dtos.CreateBillWithoutParticipantItemResponse
+	totalAmountAfterTax := 0
 
 	for _, item := range req.Items {
 		itemID := uuid.NewString()
+		itemSubtotal := float64(item.Price) * float64(item.Quantity)
+
+		taxPortion := itemSubtotal * float64(req.Tax) / 100
+		servicePortion := itemSubtotal * float64(req.Service) / 100
+
+		priceAfterTax := int(math.Round(itemSubtotal + taxPortion + servicePortion))
+		totalAmountAfterTax += priceAfterTax
+
 		newItem := models.Item{
-			ItemID:   itemID,
-			BillID:   bill.BillID,
-			Name:     item.Name,
-			Price:    item.UnitPrice,
-			Quantity: item.Quantity,
+			ItemID:        itemID,
+			BillID:        bill.BillID,
+			Name:          item.Name,
+			Price:         item.Price,
+			Quantity:      item.Quantity,
+			PriceAfterTax: priceAfterTax,
 		}
 
 		if err := database.DB.Create(&newItem).Error; err != nil {
@@ -135,22 +56,28 @@ func CreateBillWithoutParticipant(req dtos.CreateBillWithoutParticipantRequest) 
 			ItemID:        itemID,
 			Name:          item.Name,
 			Quantity:      item.Quantity,
-			UnitPrice:     item.UnitPrice,
-			PriceAfterTax: item.PriceAfterTax,
-			PriceInHBAR:   item.PriceInHBAR,
+			UnitPrice:     item.Price,
+			PriceAfterTax: priceAfterTax,
 		})
 	}
 
+	bill.TotalAmountAfterTax = totalAmountAfterTax
+	if err := database.DB.Save(&bill).Error; err != nil {
+		return nil, errors.New("failed to update bill with totalAmountAfterTax: " + err.Error())
+	}
+
 	resp := &dtos.CreateBillWithoutParticipantResponse{
-		BillID:      bill.BillID,
-		StoreName:   req.StoreName,
-		Date:        req.Date,
-		Tax:         req.Tax,
-		Service:     req.Service,
-		TotalAmount: req.TotalAmount,
-		CreatedAt:   bill.CreatedAt.Format(time.RFC3339),
-		CreatorID:   req.CreatorID,
-		Items:       itemResponses,
+		BillID:              bill.BillID,
+		BillTitle:           bill.BillTitle,
+		StoreName:           bill.StoreName,
+		Date:                req.Date,
+		Tax:                 req.Tax,
+		Service:             req.Service,
+		TotalAmount:         req.TotalAmount,
+		TotalAmountAfterTax: totalAmountAfterTax,
+		CreatedAt:           bill.CreatedAt.Format(time.RFC3339),
+		CreatorID:           bill.CreatorID,
+		Items:               itemResponses,
 	}
 
 	return resp, nil
@@ -196,4 +123,130 @@ func GetBillsByCreator(creatorID string, billID string) ([]dtos.GetBillByCreator
 	}
 
 	return response, nil
+}
+
+func AssignParticipantsToItem(req dtos.AssignParticipantsRequest) (*dtos.AssignedParticipantResponse, error) {
+	var item models.Item
+
+	if err := database.DB.First(&item, "item_id = ?", req.ItemID).Error; err != nil {
+		return nil, errors.New("item not found")
+	}
+
+	if len(req.ParticipantID) == 0 {
+		return nil, errors.New("no participant IDs provided")
+	}
+
+	share := item.PriceAfterTax / len(req.ParticipantID)
+	var assigned []dtos.AssignedParticipant
+
+	for _, pid := range req.ParticipantID {
+		participant := models.Participant{
+			ParticipantID: pid,
+			ItemID:        item.ItemID,
+			AmountOwed:    share,
+			IsPaid:        false,
+		}
+
+		if err := database.DB.Create(&participant).Error; err != nil {
+			return nil, errors.New("failed to assign participant")
+		}
+
+		assigned = append(assigned, dtos.AssignedParticipant{
+			ParticipantID: pid,
+			ItemID:        item.ItemID,
+			AmountOwed:    share,
+			IsPaid:        false,
+		})
+
+	}
+
+	resp := &dtos.AssignedParticipantResponse{
+		ItemID:       item.ItemID,
+		ItemName:     item.Name,
+		Participants: assigned,
+	}
+
+	return resp, nil
+}
+
+func GetBillsByParticipantID(participantID string) ([]dtos.ParticipantBillResponse, error) {
+	if participantID == "" {
+		return nil, errors.New("participantId is required")
+	}
+
+	var participantRecords []models.Participant
+	if err := database.DB.Where("participant_id = ?", participantID).Find(&participantRecords).Error; err != nil {
+		return nil, errors.New("failed to fetch participant data: " + err.Error())
+	}
+
+	billMap := make(map[string]bool)
+	itemToBill := make(map[string]string)
+
+	for _, p := range participantRecords {
+		var item models.Item
+		if err := database.DB.Select("item_id", "bill_id").First(&item, "item_id = ?", p.ItemID).Error; err != nil {
+			continue
+		}
+		billMap[item.BillID] = true
+		itemToBill[item.ItemID] = item.BillID
+	}
+
+	var responses []dtos.ParticipantBillResponse
+
+	for billID := range billMap {
+		var bill models.Bill
+		if err := database.DB.First(&bill, "bill_id = ?", billID).Error; err != nil {
+			continue
+		}
+
+		var items []models.Item
+		if err := database.DB.Where("bill_id = ?", bill.BillID).Find(&items).Error; err != nil {
+			continue
+		}
+
+		var itemDTOs []dtos.ParticipantItemResponse
+		var allParticipants []dtos.ParticipantListResponse
+		participantSet := make(map[string]bool)
+
+		for _, item := range items {
+			itemDTOs = append(itemDTOs, dtos.ParticipantItemResponse{
+				ItemID:        item.ItemID,
+				Name:          item.Name,
+				Quantity:      item.Quantity,
+				Price:         item.Price,
+				PriceAfterTax: item.PriceAfterTax,
+			})
+
+			var participants []models.Participant
+			if err := database.DB.Where("item_id = ?", item.ItemID).Find(&participants).Error; err != nil {
+				continue
+			}
+
+			for _, p := range participants {
+				if !participantSet[p.ParticipantID] {
+					participantSet[p.ParticipantID] = true
+					allParticipants = append(allParticipants, dtos.ParticipantListResponse{
+						ParticipantID: p.ParticipantID,
+						AmountOwed:    p.AmountOwed,
+						IsPaid:        p.IsPaid,
+					})
+				}
+			}
+		}
+
+		response := dtos.ParticipantBillResponse{
+			BillID:      bill.BillID,
+			BillTitle:   bill.BillTitle,
+			TotalAmount: bill.TotalAmount,
+			CreatorID:   bill.CreatorID,
+			Tax:         bill.Tax,
+			Service:     bill.Service,
+			Item:        itemDTOs,
+			Participant: allParticipants,
+		}
+
+		responses = append(responses, response)
+	}
+
+	return responses, nil
 }

@@ -22,7 +22,7 @@ const docTemplate = `{
     "paths": {
         "/bills/assign-participants": {
             "post": {
-                "description": "Assign participants to a bill and split item prices equally per participant",
+                "description": "Assign Participant To Item",
                 "consumes": [
                     "application/json"
                 ],
@@ -32,11 +32,11 @@ const docTemplate = `{
                 "tags": [
                     "Bill"
                 ],
-                "summary": "Assign participants to a bill",
+                "summary": "Assign Participant To Item",
                 "parameters": [
                     {
-                        "description": "Assign Participants Request",
-                        "name": "request",
+                        "description": "Participants",
+                        "name": "bill",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -45,17 +45,29 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Structured Assign Participants Result",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.AssignParticipantsResponse"
+                            "$ref": "#/definitions/dtos.AssignedParticipantResponse"
                         }
                     },
                     "400": {
-                        "description": "Invalid input"
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
                     },
                     "500": {
-                        "description": "Internal error"
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
@@ -160,6 +172,56 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bills/by-participant/{participantId}": {
+            "get": {
+                "description": "Get bills by participant ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Get bills by participant ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Participant ID",
+                        "name": "participantId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.ParticipantBillResponse"
+                            }
                         }
                     },
                     "400": {
@@ -718,24 +780,21 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.AssignParticipantDetailRequest": {
+        "dtos.AssignParticipantsRequest": {
             "type": "object",
             "properties": {
-                "isPaid": {
-                    "type": "boolean"
+                "itemId": {
+                    "type": "string"
                 },
-                "items": {
+                "participants": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dtos.AssignParticipantItemRequest"
+                        "type": "string"
                     }
-                },
-                "participantId": {
-                    "type": "string"
                 }
             }
         },
-        "dtos.AssignParticipantDetailResponse": {
+        "dtos.AssignedParticipant": {
             "type": "object",
             "properties": {
                 "amountOwed": {
@@ -744,60 +803,27 @@ const docTemplate = `{
                 "isPaid": {
                     "type": "boolean"
                 },
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dtos.AssignParticipantItemWithAmount"
-                    }
+                "itemId": {
+                    "type": "string"
                 },
                 "participantId": {
                     "type": "string"
                 }
             }
         },
-        "dtos.AssignParticipantItemRequest": {
+        "dtos.AssignedParticipantResponse": {
             "type": "object",
             "properties": {
                 "itemId": {
                     "type": "string"
-                }
-            }
-        },
-        "dtos.AssignParticipantItemWithAmount": {
-            "type": "object",
-            "properties": {
-                "amount": {
-                    "type": "integer"
                 },
-                "itemId": {
-                    "type": "string"
-                }
-            }
-        },
-        "dtos.AssignParticipantsRequest": {
-            "type": "object",
-            "properties": {
-                "billId": {
+                "itemName": {
                     "type": "string"
                 },
                 "participants": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dtos.AssignParticipantDetailRequest"
-                    }
-                }
-            }
-        },
-        "dtos.AssignParticipantsResponse": {
-            "type": "object",
-            "properties": {
-                "billId": {
-                    "type": "string"
-                },
-                "participants": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dtos.AssignParticipantDetailResponse"
+                        "$ref": "#/definitions/dtos.AssignedParticipant"
                     }
                 }
             }
@@ -812,14 +838,6 @@ const docTemplate = `{
                 "price": {
                     "type": "integer",
                     "example": 40000
-                },
-                "priceAfterTax": {
-                    "type": "number",
-                    "example": 87200
-                },
-                "priceInHBAR": {
-                    "type": "number",
-                    "example": 0
                 },
                 "quantity": {
                     "type": "integer",
@@ -840,10 +858,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "priceAfterTax": {
-                    "type": "number"
-                },
-                "priceInHBAR": {
-                    "type": "number"
+                    "type": "integer"
                 },
                 "quantity": {
                     "type": "integer"
@@ -853,6 +868,10 @@ const docTemplate = `{
         "dtos.CreateBillWithoutParticipantRequest": {
             "type": "object",
             "properties": {
+                "billTitle": {
+                    "type": "string",
+                    "example": "Makan orang hitam bersama"
+                },
                 "creatorId": {
                     "type": "string",
                     "example": "user123"
@@ -891,6 +910,9 @@ const docTemplate = `{
                 "billId": {
                     "type": "string"
                 },
+                "billTitle": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -916,6 +938,9 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "totalAmount": {
+                    "type": "integer"
+                },
+                "totalAmountAfterTax": {
                     "type": "integer"
                 }
             }
@@ -1031,6 +1056,75 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.ParticipantBillResponse": {
+            "type": "object",
+            "properties": {
+                "billId": {
+                    "type": "string"
+                },
+                "billTitle": {
+                    "type": "string"
+                },
+                "creatorId": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.ParticipantItemResponse"
+                    }
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.ParticipantListResponse"
+                    }
+                },
+                "service": {
+                    "type": "number"
+                },
+                "tax": {
+                    "type": "number"
+                },
+                "totalAmount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.ParticipantItemResponse": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "priceAfterTax": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.ParticipantListResponse": {
+            "type": "object",
+            "properties": {
+                "amountOwed": {
+                    "type": "integer"
+                },
+                "isPaid": {
+                    "type": "boolean"
+                },
+                "participantId": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.PendingFriendResponse": {
             "type": "object",
             "properties": {
@@ -1055,25 +1149,13 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Front and rear brake cables"
                 },
-                "priceAfterTax": {
+                "price": {
                     "type": "number",
-                    "example": 105.88083
-                },
-                "priceInHBAR": {
-                    "type": "number",
-                    "example": 0
+                    "example": 100
                 },
                 "quantity": {
                     "type": "number",
                     "example": 1
-                },
-                "totalPrice": {
-                    "type": "number",
-                    "example": 100
-                },
-                "unitPrice": {
-                    "type": "number",
-                    "example": 100
                 }
             }
         },

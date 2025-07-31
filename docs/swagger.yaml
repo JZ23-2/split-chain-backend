@@ -42,58 +42,35 @@ definitions:
     - friend_wallet_address
     - user_wallet_address
     type: object
-  dtos.AssignParticipantDetailRequest:
+  dtos.AssignParticipantsRequest:
     properties:
-      isPaid:
-        type: boolean
-      items:
-        items:
-          $ref: '#/definitions/dtos.AssignParticipantItemRequest'
-        type: array
-      participantId:
+      itemId:
         type: string
+      participants:
+        items:
+          type: string
+        type: array
     type: object
-  dtos.AssignParticipantDetailResponse:
+  dtos.AssignedParticipant:
     properties:
       amountOwed:
         type: integer
       isPaid:
         type: boolean
-      items:
-        items:
-          $ref: '#/definitions/dtos.AssignParticipantItemWithAmount'
-        type: array
+      itemId:
+        type: string
       participantId:
         type: string
     type: object
-  dtos.AssignParticipantItemRequest:
+  dtos.AssignedParticipantResponse:
     properties:
       itemId:
         type: string
-    type: object
-  dtos.AssignParticipantItemWithAmount:
-    properties:
-      amount:
-        type: integer
-      itemId:
-        type: string
-    type: object
-  dtos.AssignParticipantsRequest:
-    properties:
-      billId:
+      itemName:
         type: string
       participants:
         items:
-          $ref: '#/definitions/dtos.AssignParticipantDetailRequest'
-        type: array
-    type: object
-  dtos.AssignParticipantsResponse:
-    properties:
-      billId:
-        type: string
-      participants:
-        items:
-          $ref: '#/definitions/dtos.AssignParticipantDetailResponse'
+          $ref: '#/definitions/dtos.AssignedParticipant'
         type: array
     type: object
   dtos.CreateBillWithoutParticipantItemRequest:
@@ -104,12 +81,6 @@ definitions:
       price:
         example: 40000
         type: integer
-      priceAfterTax:
-        example: 87200
-        type: number
-      priceInHBAR:
-        example: 0
-        type: number
       quantity:
         example: 2
         type: integer
@@ -123,14 +94,15 @@ definitions:
       price:
         type: integer
       priceAfterTax:
-        type: number
-      priceInHBAR:
-        type: number
+        type: integer
       quantity:
         type: integer
     type: object
   dtos.CreateBillWithoutParticipantRequest:
     properties:
+      billTitle:
+        example: Makan orang hitam bersama
+        type: string
       creatorId:
         example: user123
         type: string
@@ -158,6 +130,8 @@ definitions:
     properties:
       billId:
         type: string
+      billTitle:
+        type: string
       createdAt:
         type: string
       creatorId:
@@ -175,6 +149,8 @@ definitions:
       tax:
         type: number
       totalAmount:
+        type: integer
+      totalAmountAfterTax:
         type: integer
     type: object
   dtos.DeclineFriendRequest:
@@ -250,6 +226,51 @@ definitions:
       totalAmount:
         type: integer
     type: object
+  dtos.ParticipantBillResponse:
+    properties:
+      billId:
+        type: string
+      billTitle:
+        type: string
+      creatorId:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dtos.ParticipantItemResponse'
+        type: array
+      participants:
+        items:
+          $ref: '#/definitions/dtos.ParticipantListResponse'
+        type: array
+      service:
+        type: number
+      tax:
+        type: number
+      totalAmount:
+        type: integer
+    type: object
+  dtos.ParticipantItemResponse:
+    properties:
+      itemId:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      priceAfterTax:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  dtos.ParticipantListResponse:
+    properties:
+      amountOwed:
+        type: integer
+      isPaid:
+        type: boolean
+      participantId:
+        type: string
+    type: object
   dtos.PendingFriendResponse:
     properties:
       friend_wallet_address:
@@ -266,20 +287,11 @@ definitions:
       name:
         example: Front and rear brake cables
         type: string
-      priceAfterTax:
-        example: 105.88083
-        type: number
-      priceInHBAR:
-        example: 0
+      price:
+        example: 100
         type: number
       quantity:
         example: 1
-        type: number
-      totalPrice:
-        example: 100
-        type: number
-      unitPrice:
-        example: 100
         type: number
     type: object
   dtos.ReceiptResponse:
@@ -325,27 +337,34 @@ paths:
     post:
       consumes:
       - application/json
-      description: Assign participants to a bill and split item prices equally per
-        participant
+      description: Assign Participant To Item
       parameters:
-      - description: Assign Participants Request
+      - description: Participants
         in: body
-        name: request
+        name: bill
         required: true
         schema:
           $ref: '#/definitions/dtos.AssignParticipantsRequest'
       produces:
       - application/json
       responses:
-        "201":
-          description: Structured Assign Participants Result
+        "200":
+          description: OK
           schema:
-            $ref: '#/definitions/dtos.AssignParticipantsResponse'
+            $ref: '#/definitions/dtos.AssignedParticipantResponse'
         "400":
-          description: Invalid input
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
-          description: Internal error
-      summary: Assign participants to a bill
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Assign Participant To Item
       tags:
       - Bill
   /bills/bill-without-participant:
@@ -426,6 +445,39 @@ paths:
               type: string
             type: object
       summary: Get bills by creator
+      tags:
+      - Bill
+  /bills/by-participant/{participantId}:
+    get:
+      description: Get bills by participant ID
+      parameters:
+      - description: Participant ID
+        in: path
+        name: participantId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.ParticipantBillResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get bills by participant ID
       tags:
       - Bill
   /check:
