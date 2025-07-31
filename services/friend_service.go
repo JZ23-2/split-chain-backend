@@ -248,3 +248,35 @@ func GetPendingFriendRequestService(userWalletAddress string) ([]dtos.PendingFri
 
 	}
 }
+
+func GetPendingFriendRequestServiceRequestedUser(friendWalletAddress string) ([]dtos.PendingFriendResponse, error) {
+	if friendWalletAddress == "" {
+		return nil, errors.New("invalid request")
+	}
+
+	var pendingRequests []models.PendingFriendRequest
+	err := database.DB.
+		Where("friend_wallet_address = ? AND status = ?", friendWalletAddress, "Pending").
+		Find(&pendingRequests).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(pendingRequests) == 0 {
+		return []dtos.PendingFriendResponse{}, nil
+	} else {
+		var responses []dtos.PendingFriendResponse
+		for _, r := range pendingRequests {
+			responses = append(responses, dtos.PendingFriendResponse{
+				ID:                  r.ID,
+				UserWalletAddress:   r.UserWalletAddress,
+				FriendWalletAddress: r.FriendWalletAddress,
+				Status:              r.Status,
+			})
+		}
+
+		return responses, nil
+
+	}
+}

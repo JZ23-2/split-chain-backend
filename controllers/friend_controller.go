@@ -213,3 +213,33 @@ func GetPendingFriendRequest(c *gin.Context) {
 
 	utils.SuccessResponse(c, http.StatusOK, "Success fetch pending friend request", res)
 }
+
+// GetPendingFriendRequestByFriendWalletAddress godoc
+//
+//	@Summary	Get pending friend request by friend wallet address
+//
+// Description get pending friend request by friend wallet address
+//
+//	@Tags		Friend
+//	@Accept		json
+//	@Produce	json
+//	@Param		friend_wallet_address	path string true "friend wallet addres"
+//	@Success	200		{object}	dtos.PendingFriendResponse
+//	@Failure	400		"Invalid Request"
+//	@Failure	500		"Internal Server Error"
+//	@Router		/friends/get-pending-request-by-friend/{friend_wallet_address} [get]
+func GetPendingFriendRequestByFriendWalletAddress(c *gin.Context) {
+	friendWalletAddress := c.Param("friend_wallet_address")
+
+	res, err := services.GetPendingFriendRequestServiceRequestedUser(friendWalletAddress)
+	if err != nil {
+		if err.Error() == "invalid request" {
+			utils.FailedResponse(c, http.StatusBadRequest, err.Error())
+		} else {
+			utils.FailedResponse(c, http.StatusInternalServerError, "Failed to fetch pending friend request")
+		}
+		return
+	}
+
+	utils.SuccessResponse(c, http.StatusOK, "Success fetch pending friend request", res)
+}

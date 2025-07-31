@@ -405,6 +405,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/friends/get-pending-request-by-friend/{friend_wallet_address}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Friend"
+                ],
+                "summary": "Get pending friend request by friend wallet address",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "friend wallet addres",
+                        "name": "friend_wallet_address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.PendingFriendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/friends/get-pending-request/{user_wallet_address}": {
             "get": {
                 "consumes": [
