@@ -887,6 +887,9 @@
         "dtos.CreateBillWithoutParticipantResponse": {
             "type": "object",
             "properties": {
+                "billDate": {
+                    "type": "string"
+                },
                 "billId": {
                     "type": "string"
                 },
@@ -894,9 +897,6 @@
                     "type": "string"
                 },
                 "creatorId": {
-                    "type": "string"
-                },
-                "date": {
                     "type": "string"
                 },
                 "items": {

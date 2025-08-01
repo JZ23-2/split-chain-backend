@@ -120,13 +120,13 @@ definitions:
     type: object
   dtos.CreateBillWithoutParticipantResponse:
     properties:
+      billDate:
+        type: string
       billId:
         type: string
       createdAt:
         type: string
       creatorId:
-        type: string
-      date:
         type: string
       items:
         items:

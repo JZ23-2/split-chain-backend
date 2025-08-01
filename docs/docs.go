@@ -896,6 +896,9 @@ const docTemplate = `{
         "dtos.CreateBillWithoutParticipantResponse": {
             "type": "object",
             "properties": {
+                "billDate": {
+                    "type": "string"
+                },
                 "billId": {
                     "type": "string"
                 },
@@ -903,9 +906,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "creatorId": {
-                    "type": "string"
-                },
-                "date": {
                     "type": "string"
                 },
                 "items": {

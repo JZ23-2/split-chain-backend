@@ -68,7 +68,7 @@ type CreateBillWithoutParticipantItemResponse struct {
 type CreateBillWithoutParticipantResponse struct {
 	BillID    string                                     `json:"billId"`
 	StoreName string                                     `json:"storeName"`
-	BillDate  time.Time                                  `json:"date"`
+	BillDate  time.Time                                  `json:"billDate"`
 	Tax       float32                                    `json:"tax"`
 	CreatedAt string                                     `json:"createdAt"`
 	CreatorID string                                     `json:"creatorId"`
