@@ -253,3 +253,56 @@ func GetBillsByParticipantID(participantID string) ([]dtos.ParticipantBillRespon
 
 	return responses, nil
 }
+
+func GetBillByBIllID(billID string) (dtos.ParticipantBillResponse, error) {
+	if billID == "" {
+		return dtos.ParticipantBillResponse{}, errors.New("participantId is required")
+	}
+
+	var bill models.Bill
+	if err := database.DB.Preload("Items").Where("bill_id = ?", billID).First(&bill).Error; err != nil {
+		return dtos.ParticipantBillResponse{}, errors.New("item not found")
+	}
+
+	var itemResponses []dtos.ParticipantItemResponse
+	var participantResponses []dtos.ParticipantListResponse
+	participantMap := make(map[string]bool)
+
+	for _, item := range bill.Items {
+		itemResponses = append(itemResponses, dtos.ParticipantItemResponse{
+			ItemID:   item.ItemID,
+			Name:     item.Name,
+			Quantity: item.Quantity,
+			Price:    item.Price,
+		})
+
+		var participants []models.Participant
+		if err := database.DB.Where("item_id = ?", item.ItemID).Find(&participants).Error; err != nil {
+			return dtos.ParticipantBillResponse{}, errors.New("failed to get participants: " + err.Error())
+		}
+
+		for _, p := range participants {
+			if !participantMap[p.ParticipantID] {
+				participantResponses = append(participantResponses, dtos.ParticipantListResponse{
+					ParticipantID: p.ParticipantID,
+					AmountOwed:    p.AmountOwed,
+					IsPaid:        p.IsPaid,
+				})
+				participantMap[p.ParticipantID] = true
+			}
+		}
+	}
+
+	resp := dtos.ParticipantBillResponse{
+		BillID:      bill.BillID,
+		StoreName:   bill.StoreName,
+		CreatorID:   bill.CreatorID,
+		BillDate:    bill.BillDate,
+		CreatedAt:   bill.CreatedAt.Format(time.RFC3339),
+		Tax:         bill.Tax,
+		Item:        itemResponses,
+		Participant: participantResponses,
+	}
+
+	return resp, nil
+}

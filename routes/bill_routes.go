@@ -12,5 +12,6 @@ func BillRoutes(api *gin.RouterGroup) {
 		bill.POST("/bill-without-participant", controllers.CreateBillWithoutParticipantController)
 		bill.GET("/by-creator", controllers.GetBillByCreatorController)
 		bill.GET("/by-participant/:participantId", controllers.GetBillsByParticipantController)
+		bill.GET("/by-billId/:billId", controllers.GetBillByBillIDHandler)
 	}
 }

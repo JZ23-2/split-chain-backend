@@ -124,3 +124,32 @@ func GetBillsByParticipantController(c *gin.Context) {
 
 	c.JSON(http.StatusOK, bills)
 }
+
+// GetBillsByBillIdHandler godoc
+// @Summary      Get bills by Bill ID
+// @Description  Get bills by Bill ID
+// @Tags         Bill
+// @Param        billId path string true "Bill ID"
+// @Produce      json
+// @Success      200 {array} dtos.ParticipantBillResponse
+// @Failure      400 {object} map[string]string "Bad Request"
+// @Failure      500 {object} map[string]string "Internal Server Error"
+// @Router       /bills/by-billId/{billId} [get]
+func GetBillByBillIDHandler(c *gin.Context) {
+	billID := c.Param("billId")
+	if billID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "billId is required"})
+		return
+	}
+
+	bill, err := services.GetBillByBIllID(billID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Bill fetched successfully",
+		"data":    bill,
+	})
+}

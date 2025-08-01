@@ -124,6 +124,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/bills/by-billId/{billId}": {
+            "get": {
+                "description": "Get bills by Bill ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Get bills by Bill ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bill ID",
+                        "name": "billId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.ParticipantBillResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/bills/by-creator": {
             "get": {
                 "description": "Get all bills created by a specific creator, optionally filter by billId",

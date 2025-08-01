@@ -392,6 +392,39 @@ paths:
       summary: Create bill (no participants)
       tags:
       - Bill
+  /bills/by-billId/{billId}:
+    get:
+      description: Get bills by Bill ID
+      parameters:
+      - description: Bill ID
+        in: path
+        name: billId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dtos.ParticipantBillResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get bills by Bill ID
+      tags:
+      - Bill
   /bills/by-creator:
     get:
       consumes:
