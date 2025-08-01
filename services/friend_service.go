@@ -82,35 +82,34 @@ func DeclineFriendRequestService(req dtos.DeclineFriendRequest) (dtos.DeclineFri
 func AddFriendRequestService(req dtos.AddFriendRequest) (any, string, int, error) {
 	var user, friend models.User
 
+	if req.UserWalletAddress == req.FriendWalletAddress {
+		return nil, "Cannot add yourself as a friend", 400, errors.New("cannot add yourself")
+	}
+
 	if err := database.DB.First(&user, "wallet_address = ?", req.UserWalletAddress).Error; err != nil {
-		return nil, "User Not Found", 404, err
+		return nil, "User not found", 404, err
 	}
-
 	if err := database.DB.First(&friend, "wallet_address = ?", req.FriendWalletAddress).Error; err != nil {
-		return nil, "Friend Not Found", 404, err
+		return nil, "Friend not found", 404, err
 	}
 
-	var existing models.PendingFriendRequest
+	var declinedRequest models.PendingFriendRequest
 	if err := database.DB.
 		Where("user_wallet_address = ? AND friend_wallet_address = ? AND status = ?", req.UserWalletAddress, req.FriendWalletAddress, "Declined").
-		First(&existing).Error; err == nil {
+		First(&declinedRequest).Error; err == nil {
 
-		existing.Status = "Pending"
-		if err := database.DB.Save(&existing).Error; err != nil {
+		declinedRequest.Status = "Pending"
+		if err := database.DB.Save(&declinedRequest).Error; err != nil {
 			return nil, "Failed to re-activate declined request", 500, err
 		}
-		return existing, "Successfully Added Friend Request", 200, nil
+		return declinedRequest, "Friend request re-activated", 200, nil
 	}
 
+	var reciprocalRequest models.PendingFriendRequest
 	if err := database.DB.
-		Where(
-			"(user_wallet_address = ? AND friend_wallet_address = ?) OR (user_wallet_address = ? AND friend_wallet_address = ?)",
-			req.UserWalletAddress, req.FriendWalletAddress,
-			req.FriendWalletAddress, req.UserWalletAddress,
-		).
-		First(&existing).Error; err == nil {
+		Where("user_wallet_address = ? AND friend_wallet_address = ? AND status = ?", req.FriendWalletAddress, req.UserWalletAddress, "Pending").
+		First(&reciprocalRequest).Error; err == nil {
 
-		// Accept the request and make it a Friend record
 		friend1 := models.Friend{
 			UserWalletAddress:   req.FriendWalletAddress,
 			FriendWalletAddress: req.UserWalletAddress,
@@ -141,7 +140,6 @@ func AddFriendRequestService(req dtos.AddFriendRequest) (any, string, int, error
 			FriendWalletAddress: friend1.FriendWalletAddress,
 			Nickname:            &friend1.Nickname,
 		}
-
 		friend2Resp := dtos.AcceptFriendResponse{
 			ID:                  friend2.ID,
 			UserWalletAddress:   friend2.UserWalletAddress,
@@ -152,19 +150,27 @@ func AddFriendRequestService(req dtos.AddFriendRequest) (any, string, int, error
 		return map[string]any{
 			"friend_1": friend1Resp,
 			"friend_2": friend2Resp,
-		}, "Friend Request Accepted", 200, nil
+		}, "Friend request accepted", 200, nil
 	}
 
 	var friendCheck models.Friend
 	if err := database.DB.
 		Where("user_wallet_address = ? AND friend_wallet_address = ?", req.UserWalletAddress, req.FriendWalletAddress).
 		First(&friendCheck).Error; err == nil {
-		return nil, "Already Friend", 409, errors.New("already friends")
+		return nil, "Already friends", 409, errors.New("already friends")
+	}
+
+	var existingRequest models.PendingFriendRequest
+	if err := database.DB.
+		Where("user_wallet_address = ? AND friend_wallet_address = ? AND status = ?", req.UserWalletAddress, req.FriendWalletAddress, "Pending").
+		First(&existingRequest).Error; err == nil {
+		return nil, "Request already sent", 409, errors.New("already requested")
 	}
 
 	newRequest := models.PendingFriendRequest{
 		UserWalletAddress:   req.UserWalletAddress,
 		FriendWalletAddress: req.FriendWalletAddress,
+		Status:              "Pending",
 	}
 	if err := database.DB.Create(&newRequest).Error; err != nil {
 		return nil, "Failed to create friend request", 500, err
@@ -177,7 +183,7 @@ func AddFriendRequestService(req dtos.AddFriendRequest) (any, string, int, error
 		Status:              "Pending",
 	}
 
-	return response, "Successfully Added Friend Request", 200, nil
+	return response, "Successfully added friend request", 200, nil
 }
 
 func GetFriendService(userWalletAddress string) ([]dtos.FriendResponse, error) {

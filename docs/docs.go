@@ -295,6 +295,105 @@ const docTemplate = `{
                 }
             }
         },
+        "/bills/delete-bill/{billId}": {
+            "delete": {
+                "description": "Delete bill by Bill ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Delete bill by Bill ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bill ID",
+                        "name": "billId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted bill",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bills/update-bill": {
+            "patch": {
+                "description": "Update Bill",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bill"
+                ],
+                "summary": "Update Bill",
+                "parameters": [
+                    {
+                        "description": "Bill Data",
+                        "name": "bill",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UpdateBillRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UpdateBillResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/check": {
             "get": {
                 "description": "Check backend health",
@@ -1046,6 +1145,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.GetBillByCreatorParticipantResponse"
+                    }
+                },
                 "price": {
                     "type": "integer"
                 },
@@ -1144,6 +1249,12 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.ParticipantListResponse"
+                    }
+                },
                 "price": {
                     "type": "integer"
                 },
@@ -1191,11 +1302,11 @@ const docTemplate = `{
                     "example": "Front and rear brake cables"
                 },
                 "price": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 100
                 },
                 "quantity": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 1
                 }
             }
@@ -1232,6 +1343,151 @@ const docTemplate = `{
                 "data": {},
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "dtos.UpdateBillItemRequest": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "type": "string",
+                    "example": "item-001"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Nasi Goreng"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.UpdateBillParticipantRequest"
+                    }
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 20000
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "dtos.UpdateBillItemResponse": {
+            "type": "object",
+            "properties": {
+                "itemId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "participants": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.UpdateBillParticipantResponse"
+                    }
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.UpdateBillParticipantRequest": {
+            "type": "object",
+            "properties": {
+                "amountOwed": {
+                    "type": "integer",
+                    "example": 15000
+                },
+                "isPaid": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "participantId": {
+                    "type": "string",
+                    "example": "u123"
+                }
+            }
+        },
+        "dtos.UpdateBillParticipantResponse": {
+            "type": "object",
+            "properties": {
+                "amountOwed": {
+                    "type": "integer"
+                },
+                "isPaid": {
+                    "type": "boolean"
+                },
+                "participantId": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.UpdateBillRequest": {
+            "type": "object",
+            "properties": {
+                "billDate": {
+                    "type": "string",
+                    "example": "2025-07-30T00:00:00Z"
+                },
+                "billId": {
+                    "type": "string",
+                    "example": "bill-001"
+                },
+                "createdAt": {
+                    "type": "string",
+                    "example": "2025-07-31T15:04:05Z"
+                },
+                "creatorId": {
+                    "type": "string",
+                    "example": "user-123"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.UpdateBillItemRequest"
+                    }
+                },
+                "storeName": {
+                    "type": "string",
+                    "example": "Warung Makan Bu Tini"
+                },
+                "tax": {
+                    "type": "number",
+                    "example": 10
+                }
+            }
+        },
+        "dtos.UpdateBillResponse": {
+            "type": "object",
+            "properties": {
+                "billDate": {
+                    "type": "string"
+                },
+                "billId": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "creatorId": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.UpdateBillItemResponse"
+                    }
+                },
+                "storeName": {
+                    "type": "string"
+                },
+                "tax": {
+                    "type": "number"
                 }
             }
         },

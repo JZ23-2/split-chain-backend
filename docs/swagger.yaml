@@ -186,6 +186,10 @@ definitions:
         type: string
       name:
         type: string
+      participants:
+        items:
+          $ref: '#/definitions/dtos.GetBillByCreatorParticipantResponse'
+        type: array
       price:
         type: integer
       quantity:
@@ -250,6 +254,10 @@ definitions:
         type: string
       name:
         type: string
+      participants:
+        items:
+          $ref: '#/definitions/dtos.ParticipantListResponse'
+        type: array
       price:
         type: integer
       quantity:
@@ -282,10 +290,10 @@ definitions:
         type: string
       price:
         example: 100
-        type: number
+        type: integer
       quantity:
         example: 1
-        type: number
+        type: integer
     type: object
   dtos.ReceiptResponse:
     properties:
@@ -310,6 +318,105 @@ definitions:
       data: {}
       message:
         type: string
+    type: object
+  dtos.UpdateBillItemRequest:
+    properties:
+      itemId:
+        example: item-001
+        type: string
+      name:
+        example: Nasi Goreng
+        type: string
+      participants:
+        items:
+          $ref: '#/definitions/dtos.UpdateBillParticipantRequest'
+        type: array
+      price:
+        example: 20000
+        type: integer
+      quantity:
+        example: 2
+        type: integer
+    type: object
+  dtos.UpdateBillItemResponse:
+    properties:
+      itemId:
+        type: string
+      name:
+        type: string
+      participants:
+        items:
+          $ref: '#/definitions/dtos.UpdateBillParticipantResponse'
+        type: array
+      price:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  dtos.UpdateBillParticipantRequest:
+    properties:
+      amountOwed:
+        example: 15000
+        type: integer
+      isPaid:
+        example: false
+        type: boolean
+      participantId:
+        example: u123
+        type: string
+    type: object
+  dtos.UpdateBillParticipantResponse:
+    properties:
+      amountOwed:
+        type: integer
+      isPaid:
+        type: boolean
+      participantId:
+        type: string
+    type: object
+  dtos.UpdateBillRequest:
+    properties:
+      billDate:
+        example: "2025-07-30T00:00:00Z"
+        type: string
+      billId:
+        example: bill-001
+        type: string
+      createdAt:
+        example: "2025-07-31T15:04:05Z"
+        type: string
+      creatorId:
+        example: user-123
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dtos.UpdateBillItemRequest'
+        type: array
+      storeName:
+        example: Warung Makan Bu Tini
+        type: string
+      tax:
+        example: 10
+        type: number
+    type: object
+  dtos.UpdateBillResponse:
+    properties:
+      billDate:
+        type: string
+      billId:
+        type: string
+      createdAt:
+        type: string
+      creatorId:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dtos.UpdateBillItemResponse'
+        type: array
+      storeName:
+        type: string
+      tax:
+        type: number
     type: object
   models.User:
     properties:
@@ -501,6 +608,71 @@ paths:
               type: string
             type: object
       summary: Get bills by participant ID
+      tags:
+      - Bill
+  /bills/delete-bill/{billId}:
+    delete:
+      description: Delete bill by Bill ID
+      parameters:
+      - description: Bill ID
+        in: path
+        name: billId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted bill
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete bill by Bill ID
+      tags:
+      - Bill
+  /bills/update-bill:
+    patch:
+      description: Update Bill
+      parameters:
+      - description: Bill Data
+        in: body
+        name: bill
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.UpdateBillRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.UpdateBillResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update Bill
       tags:
       - Bill
   /check:

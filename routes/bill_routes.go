@@ -13,5 +13,7 @@ func BillRoutes(api *gin.RouterGroup) {
 		bill.GET("/by-creator", controllers.GetBillByCreatorController)
 		bill.GET("/by-participant/:participantId", controllers.GetBillsByParticipantController)
 		bill.GET("/by-billId/:billId", controllers.GetBillByBillIDHandler)
+		bill.DELETE("/delete-bill/:billId", controllers.DeleteBillByIDController)
+		bill.PATCH("/update-bill", controllers.UpdateBillController)
 	}
 }
