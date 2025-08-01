@@ -1,9 +1,9 @@
 package dtos
 
 type ReceiptItem struct {
-	Name     string  `json:"name" example:"Front and rear brake cables"`
-	Quantity float32 `json:"quantity" example:"1"`
-	Price    float32 `json:"price" example:"100"`
+	Name     string `json:"name" example:"Front and rear brake cables"`
+	Quantity int    `json:"quantity" example:"1"`
+	Price    int    `json:"price" example:"100"`
 }
 
 type ReceiptResponse struct {

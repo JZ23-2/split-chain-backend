@@ -12,4 +12,6 @@ Extract structured info from this receipt image and return JSON only in this for
   "tax": float,
   "service": float
 }
+
+for .00 in the back please ignore it
 Only respond with JSON. Use null if any value is unclear.
