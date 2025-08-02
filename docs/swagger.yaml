@@ -289,8 +289,8 @@ definitions:
         example: Front and rear brake cables
         type: string
       price:
-        example: 100
-        type: integer
+        example: 100.99
+        type: number
       quantity:
         example: 1
         type: integer

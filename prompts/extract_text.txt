@@ -1,4 +1,5 @@
 Extract structured info from this receipt image and return JSON only in this format:
+
 {
   "storeName": string,
   "billDate": "YYYY-MM-DD",
@@ -6,12 +7,13 @@ Extract structured info from this receipt image and return JSON only in this for
     {
       "name": string,
       "quantity": int,
-      "price": int,
+      "price": float
     }
   ],
   "tax": float,
   "service": float
 }
 
-for .00 in the back please ignore it
-Only respond with JSON. Use null if any value is unclear.
+- All monetary values (price, tax, and service) must be returned in USD format as floating point numbers (e.g., 19.99).
+- If a price ends with ".00", you can include the decimal part.
+- Only respond with JSON. Use `null` for any missing or unclear values.

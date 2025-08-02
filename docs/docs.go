@@ -1302,8 +1302,8 @@ const docTemplate = `{
                     "example": "Front and rear brake cables"
                 },
                 "price": {
-                    "type": "integer",
-                    "example": 100
+                    "type": "number",
+                    "example": 100.99
                 },
                 "quantity": {
                     "type": "integer",

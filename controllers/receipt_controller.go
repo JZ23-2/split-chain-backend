@@ -9,6 +9,7 @@ import (
 )
 
 // ExtractReceipt godoc
+//
 //	@Summary		Extract structured receipt data from an uploaded image
 //	@Description	Accepts a receipt image (PNG/JPEG) and get the detail.
 //	@Tags			receipt
