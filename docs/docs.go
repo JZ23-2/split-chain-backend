@@ -985,8 +985,8 @@ const docTemplate = `{
                     "example": "Steak"
                 },
                 "price": {
-                    "type": "integer",
-                    "example": 40000
+                    "type": "number",
+                    "example": 10.99
                 },
                 "quantity": {
                     "type": "integer",
@@ -997,6 +997,9 @@ const docTemplate = `{
         "dtos.CreateBillWithoutParticipantItemResponse": {
             "type": "object",
             "properties": {
+                "displayPrice": {
+                    "type": "string"
+                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1139,6 +1142,9 @@ const docTemplate = `{
         "dtos.GetBillByCreatorItemResponse": {
             "type": "object",
             "properties": {
+                "displayPrice": {
+                    "type": "string"
+                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1164,6 +1170,9 @@ const docTemplate = `{
             "properties": {
                 "amountOwed": {
                     "type": "integer"
+                },
+                "displayAmountOwed": {
+                    "type": "string"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1243,6 +1252,9 @@ const docTemplate = `{
         "dtos.ParticipantItemResponse": {
             "type": "object",
             "properties": {
+                "displayPrice": {
+                    "type": "string"
+                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1268,6 +1280,9 @@ const docTemplate = `{
             "properties": {
                 "amountOwed": {
                     "type": "integer"
+                },
+                "displayAmountOwed": {
+                    "type": "string"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1364,8 +1379,8 @@ const docTemplate = `{
                     }
                 },
                 "price": {
-                    "type": "integer",
-                    "example": 20000
+                    "type": "number",
+                    "example": 100.69
                 },
                 "quantity": {
                     "type": "integer",
@@ -1376,6 +1391,9 @@ const docTemplate = `{
         "dtos.UpdateBillItemResponse": {
             "type": "object",
             "properties": {
+                "displayPrice": {
+                    "type": "string"
+                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1399,10 +1417,6 @@ const docTemplate = `{
         "dtos.UpdateBillParticipantRequest": {
             "type": "object",
             "properties": {
-                "amountOwed": {
-                    "type": "integer",
-                    "example": 15000
-                },
                 "isPaid": {
                     "type": "boolean",
                     "example": false
@@ -1418,6 +1432,9 @@ const docTemplate = `{
             "properties": {
                 "amountOwed": {
                     "type": "integer"
+                },
+                "displayAmountOwed": {
+                    "type": "string"
                 },
                 "isPaid": {
                     "type": "boolean"

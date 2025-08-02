@@ -976,8 +976,8 @@
                     "example": "Steak"
                 },
                 "price": {
-                    "type": "integer",
-                    "example": 40000
+                    "type": "number",
+                    "example": 10.99
                 },
                 "quantity": {
                     "type": "integer",
@@ -988,6 +988,9 @@
         "dtos.CreateBillWithoutParticipantItemResponse": {
             "type": "object",
             "properties": {
+                "displayPrice": {
+                    "type": "string"
+                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1130,6 +1133,9 @@
         "dtos.GetBillByCreatorItemResponse": {
             "type": "object",
             "properties": {
+                "displayPrice": {
+                    "type": "string"
+                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1155,6 +1161,9 @@
             "properties": {
                 "amountOwed": {
                     "type": "integer"
+                },
+                "displayAmountOwed": {
+                    "type": "string"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1234,6 +1243,9 @@
         "dtos.ParticipantItemResponse": {
             "type": "object",
             "properties": {
+                "displayPrice": {
+                    "type": "string"
+                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1259,6 +1271,9 @@
             "properties": {
                 "amountOwed": {
                     "type": "integer"
+                },
+                "displayAmountOwed": {
+                    "type": "string"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1355,8 +1370,8 @@
                     }
                 },
                 "price": {
-                    "type": "integer",
-                    "example": 20000
+                    "type": "number",
+                    "example": 100.69
                 },
                 "quantity": {
                     "type": "integer",
@@ -1367,6 +1382,9 @@
         "dtos.UpdateBillItemResponse": {
             "type": "object",
             "properties": {
+                "displayPrice": {
+                    "type": "string"
+                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1390,10 +1408,6 @@
         "dtos.UpdateBillParticipantRequest": {
             "type": "object",
             "properties": {
-                "amountOwed": {
-                    "type": "integer",
-                    "example": 15000
-                },
                 "isPaid": {
                     "type": "boolean",
                     "example": false
@@ -1409,6 +1423,9 @@
             "properties": {
                 "amountOwed": {
                     "type": "integer"
+                },
+                "displayAmountOwed": {
+                    "type": "string"
                 },
                 "isPaid": {
                     "type": "boolean"

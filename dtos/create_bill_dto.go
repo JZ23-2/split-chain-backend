@@ -44,9 +44,9 @@ type CreateBillItemResponse struct {
 }
 
 type CreateBillWithoutParticipantItemRequest struct {
-	Name     string `json:"name" example:"Steak"`
-	Quantity int    `json:"quantity" example:"2"`
-	Price    int    `json:"price" example:"40000"`
+	Name     string  `json:"name" example:"Steak"`
+	Quantity int     `json:"quantity" example:"2"`
+	Price    float64 `json:"price" example:"10.99"`
 }
 
 type CreateBillWithoutParticipantRequest struct {
@@ -59,10 +59,11 @@ type CreateBillWithoutParticipantRequest struct {
 }
 
 type CreateBillWithoutParticipantItemResponse struct {
-	ItemID    string `json:"itemId"`
-	Name      string `json:"name"`
-	Quantity  int    `json:"quantity"`
-	UnitPrice int    `json:"price"`
+	ItemID       string `json:"itemId"`
+	Name         string `json:"name"`
+	Quantity     int    `json:"quantity"`
+	UnitPrice    int    `json:"price"`
+	DisplayPrice string `json:"displayPrice"`
 }
 
 type CreateBillWithoutParticipantResponse struct {
@@ -79,14 +80,16 @@ type GetBillByCreatorItemResponse struct {
 	ItemID       string                                `json:"itemId"`
 	Name         string                                `json:"name"`
 	Price        int                                   `json:"price"`
+	DisplayPrice string                                `json:"displayPrice"`
 	Quantity     int                                   `json:"quantity"`
 	Participants []GetBillByCreatorParticipantResponse `json:"participants"`
 }
 
 type GetBillByCreatorParticipantResponse struct {
-	ParticipantID string `json:"participantId"`
-	AmountOwed    int    `json:"amountOwed"`
-	IsPaid        bool   `json:"isPaid"`
+	ParticipantID     string `json:"participantId"`
+	AmountOwed        int    `json:"amountOwed"`
+	DisplayAmountOwed string `json:"displayAmountOwed"`
+	IsPaid            bool   `json:"isPaid"`
 }
 
 type GetBillByCreatorResponse struct {

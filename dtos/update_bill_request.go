@@ -4,7 +4,6 @@ import "time"
 
 type UpdateBillParticipantRequest struct {
 	ParticipantID string `json:"participantId" example:"u123"`
-	AmountOwed    int    `json:"amountOwed" example:"15000"`
 	IsPaid        bool   `json:"isPaid" example:"false"`
 }
 
@@ -12,7 +11,7 @@ type UpdateBillItemRequest struct {
 	ItemID                       string                         `json:"itemId" example:"item-001"`
 	Name                         string                         `json:"name" example:"Nasi Goreng"`
 	Quantity                     int                            `json:"quantity" example:"2"`
-	Price                        int                            `json:"price" example:"20000"`
+	Price                        float64                        `json:"price" example:"100.69"`
 	UpdateBillParticipantRequest []UpdateBillParticipantRequest `json:"participants"`
 }
 
@@ -27,9 +26,10 @@ type UpdateBillRequest struct {
 }
 
 type UpdateBillParticipantResponse struct {
-	ParticipantID string `json:"participantId"`
-	AmountOwed    int    `json:"amountOwed"`
-	IsPaid        bool   `json:"isPaid"`
+	ParticipantID     string `json:"participantId"`
+	AmountOwed        int    `json:"amountOwed"`
+	DisplayAmountOwed string `json:"displayAmountOwed"`
+	IsPaid            bool   `json:"isPaid"`
 }
 
 type UpdateBillItemResponse struct {
@@ -37,6 +37,7 @@ type UpdateBillItemResponse struct {
 	Name                          string                          `json:"name"`
 	Quantity                      int                             `json:"quantity"`
 	Price                         int                             `json:"price"`
+	DisplayPrice                  string                          `json:"displayPrice"`
 	UpdateBillParticipantResponse []UpdateBillParticipantResponse `json:"participants"`
 }
 

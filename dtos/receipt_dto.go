@@ -3,7 +3,7 @@ package dtos
 type ReceiptItem struct {
 	Name     string  `json:"name" example:"Front and rear brake cables"`
 	Quantity int     `json:"quantity" example:"1"`
-	Price    float32 `json:"price" example:"100.99"`
+	Price    float64 `json:"price" example:"100.99"`
 }
 
 type ReceiptResponse struct {
