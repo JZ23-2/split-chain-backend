@@ -87,14 +87,12 @@ definitions:
     type: object
   dtos.CreateBillWithoutParticipantItemResponse:
     properties:
-      displayPrice:
-        type: string
       itemId:
         type: string
       name:
         type: string
       price:
-        type: integer
+        type: number
       quantity:
         type: integer
     type: object
@@ -130,8 +128,6 @@ definitions:
         type: string
       creatorId:
         type: string
-      displayTax:
-        type: string
       items:
         items:
           $ref: '#/definitions/dtos.CreateBillWithoutParticipantItemResponse'
@@ -139,7 +135,7 @@ definitions:
       storeName:
         type: string
       tax:
-        type: integer
+        type: number
     type: object
   dtos.DeclineFriendRequest:
     properties:
@@ -204,9 +200,7 @@ definitions:
   dtos.GetBillByCreatorParticipantResponse:
     properties:
       amountOwed:
-        type: integer
-      displayAmountOwed:
-        type: string
+        type: number
       isPaid:
         type: boolean
       participantId:
@@ -220,8 +214,6 @@ definitions:
         type: string
       createdAt:
         type: string
-      displayTax:
-        type: string
       items:
         items:
           $ref: '#/definitions/dtos.GetBillByCreatorItemResponse'
@@ -233,7 +225,7 @@ definitions:
       storeName:
         type: string
       tax:
-        type: integer
+        type: number
     type: object
   dtos.ParticipantBillResponse:
     properties:
@@ -244,8 +236,6 @@ definitions:
       createdAt:
         type: string
       creatorId:
-        type: string
-      displayTax:
         type: string
       items:
         items:
@@ -258,12 +248,10 @@ definitions:
       storeName:
         type: string
       tax:
-        type: integer
+        type: number
     type: object
   dtos.ParticipantItemResponse:
     properties:
-      displayPrice:
-        type: string
       itemId:
         type: string
       name:
@@ -273,16 +261,14 @@ definitions:
           $ref: '#/definitions/dtos.ParticipantListResponse'
         type: array
       price:
-        type: integer
+        type: number
       quantity:
         type: integer
     type: object
   dtos.ParticipantListResponse:
     properties:
       amountOwed:
-        type: integer
-      displayAmountOwed:
-        type: string
+        type: number
       isPaid:
         type: boolean
       participantId:
@@ -356,8 +342,6 @@ definitions:
     type: object
   dtos.UpdateBillItemResponse:
     properties:
-      displayPrice:
-        type: string
       itemId:
         type: string
       name:
@@ -367,7 +351,7 @@ definitions:
           $ref: '#/definitions/dtos.UpdateBillParticipantResponse'
         type: array
       price:
-        type: integer
+        type: number
       quantity:
         type: integer
     type: object
@@ -383,9 +367,7 @@ definitions:
   dtos.UpdateBillParticipantResponse:
     properties:
       amountOwed:
-        type: integer
-      displayAmountOwed:
-        type: string
+        type: number
       isPaid:
         type: boolean
       participantId:
@@ -426,8 +408,6 @@ definitions:
         type: string
       creatorId:
         type: string
-      displayTax:
-        type: string
       items:
         items:
           $ref: '#/definitions/dtos.UpdateBillItemResponse'
@@ -435,7 +415,7 @@ definitions:
       storeName:
         type: string
       tax:
-        type: integer
+        type: number
     type: object
   models.User:
     properties:

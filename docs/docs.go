@@ -997,9 +997,6 @@ const docTemplate = `{
         "dtos.CreateBillWithoutParticipantItemResponse": {
             "type": "object",
             "properties": {
-                "displayPrice": {
-                    "type": "string"
-                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1007,7 +1004,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "quantity": {
                     "type": "integer"
@@ -1060,9 +1057,6 @@ const docTemplate = `{
                 "creatorId": {
                     "type": "string"
                 },
-                "displayTax": {
-                    "type": "string"
-                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1073,7 +1067,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tax": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
@@ -1172,10 +1166,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amountOwed": {
-                    "type": "integer"
-                },
-                "displayAmountOwed": {
-                    "type": "string"
+                    "type": "number"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1197,9 +1188,6 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
-                "displayTax": {
-                    "type": "string"
-                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1216,7 +1204,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tax": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
@@ -1235,9 +1223,6 @@ const docTemplate = `{
                 "creatorId": {
                     "type": "string"
                 },
-                "displayTax": {
-                    "type": "string"
-                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1254,16 +1239,13 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tax": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
         "dtos.ParticipantItemResponse": {
             "type": "object",
             "properties": {
-                "displayPrice": {
-                    "type": "string"
-                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1277,7 +1259,7 @@ const docTemplate = `{
                     }
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "quantity": {
                     "type": "integer"
@@ -1288,10 +1270,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amountOwed": {
-                    "type": "integer"
-                },
-                "displayAmountOwed": {
-                    "type": "string"
+                    "type": "number"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1400,9 +1379,6 @@ const docTemplate = `{
         "dtos.UpdateBillItemResponse": {
             "type": "object",
             "properties": {
-                "displayPrice": {
-                    "type": "string"
-                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1416,7 +1392,7 @@ const docTemplate = `{
                     }
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "quantity": {
                     "type": "integer"
@@ -1440,10 +1416,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amountOwed": {
-                    "type": "integer"
-                },
-                "displayAmountOwed": {
-                    "type": "string"
+                    "type": "number"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1503,9 +1476,6 @@ const docTemplate = `{
                 "creatorId": {
                     "type": "string"
                 },
-                "displayTax": {
-                    "type": "string"
-                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1516,7 +1486,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tax": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },

@@ -26,18 +26,16 @@ type UpdateBillRequest struct {
 }
 
 type UpdateBillParticipantResponse struct {
-	ParticipantID     string `json:"participantId"`
-	AmountOwed        int    `json:"amountOwed"`
-	DisplayAmountOwed string `json:"displayAmountOwed"`
-	IsPaid            bool   `json:"isPaid"`
+	ParticipantID string  `json:"participantId"`
+	AmountOwed    float64 `json:"amountOwed"`
+	IsPaid        bool    `json:"isPaid"`
 }
 
 type UpdateBillItemResponse struct {
 	ItemID                        string                          `json:"itemId"`
 	Name                          string                          `json:"name"`
 	Quantity                      int                             `json:"quantity"`
-	Price                         int                             `json:"price"`
-	DisplayPrice                  string                          `json:"displayPrice"`
+	Price                         float64                         `json:"price"`
 	UpdateBillParticipantResponse []UpdateBillParticipantResponse `json:"participants"`
 }
 
@@ -47,7 +45,6 @@ type UpdateBillResponse struct {
 	CreatorID              string                   `json:"creatorId"`
 	CreatedAt              time.Time                `json:"createdAt"`
 	BillDate               time.Time                `json:"billDate"`
-	Tax                    int                      `json:"tax"`
-	DisplayTax             string                   `json:"displayTax"`
+	Tax                    float64                  `json:"tax"`
 	UpdateBillItemResponse []UpdateBillItemResponse `json:"items"`
 }

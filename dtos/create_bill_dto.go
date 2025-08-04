@@ -59,22 +59,20 @@ type CreateBillWithoutParticipantRequest struct {
 }
 
 type CreateBillWithoutParticipantItemResponse struct {
-	ItemID       string `json:"itemId"`
-	Name         string `json:"name"`
-	Quantity     int    `json:"quantity"`
-	UnitPrice    int    `json:"price"`
-	DisplayPrice string `json:"displayPrice"`
+	ItemID    string  `json:"itemId"`
+	Name      string  `json:"name"`
+	Quantity  int     `json:"quantity"`
+	UnitPrice float64 `json:"price"`
 }
 
 type CreateBillWithoutParticipantResponse struct {
-	BillID     string                                     `json:"billId"`
-	StoreName  string                                     `json:"storeName"`
-	BillDate   time.Time                                  `json:"billDate"`
-	Tax        int                                        `json:"tax"`
-	DisplayTax string                                     `json:"displayTax"`
-	CreatedAt  string                                     `json:"createdAt"`
-	CreatorID  string                                     `json:"creatorId"`
-	Items      []CreateBillWithoutParticipantItemResponse `json:"items"`
+	BillID    string                                     `json:"billId"`
+	StoreName string                                     `json:"storeName"`
+	BillDate  time.Time                                  `json:"billDate"`
+	Tax       float64                                    `json:"tax"`
+	CreatedAt string                                     `json:"createdAt"`
+	CreatorID string                                     `json:"creatorId"`
+	Items     []CreateBillWithoutParticipantItemResponse `json:"items"`
 }
 
 type GetBillByCreatorItemResponse struct {
@@ -87,17 +85,15 @@ type GetBillByCreatorItemResponse struct {
 }
 
 type GetBillByCreatorParticipantResponse struct {
-	ParticipantID     string `json:"participantId"`
-	AmountOwed        int    `json:"amountOwed"`
-	DisplayAmountOwed string `json:"displayAmountOwed"`
-	IsPaid            bool   `json:"isPaid"`
+	ParticipantID string  `json:"participantId"`
+	AmountOwed    float64 `json:"amountOwed"`
+	IsPaid        bool    `json:"isPaid"`
 }
 
 type GetBillByCreatorResponse struct {
 	BillID       string                                `json:"billId"`
 	StoreName    string                                `json:"storeName"`
-	Tax          int                                   `json:"tax"`
-	DisplayTax   string                                `json:"displayTax"`
+	Tax          float64                               `json:"tax"`
 	CreatedAt    string                                `json:"createdAt"`
 	BillDate     time.Time                             `json:"billDate"`
 	Items        []GetBillByCreatorItemResponse        `json:"items"`

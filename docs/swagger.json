@@ -988,9 +988,6 @@
         "dtos.CreateBillWithoutParticipantItemResponse": {
             "type": "object",
             "properties": {
-                "displayPrice": {
-                    "type": "string"
-                },
                 "itemId": {
                     "type": "string"
                 },
@@ -998,7 +995,7 @@
                     "type": "string"
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "quantity": {
                     "type": "integer"
@@ -1051,9 +1048,6 @@
                 "creatorId": {
                     "type": "string"
                 },
-                "displayTax": {
-                    "type": "string"
-                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1064,7 +1058,7 @@
                     "type": "string"
                 },
                 "tax": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
@@ -1163,10 +1157,7 @@
             "type": "object",
             "properties": {
                 "amountOwed": {
-                    "type": "integer"
-                },
-                "displayAmountOwed": {
-                    "type": "string"
+                    "type": "number"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1188,9 +1179,6 @@
                 "createdAt": {
                     "type": "string"
                 },
-                "displayTax": {
-                    "type": "string"
-                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1207,7 +1195,7 @@
                     "type": "string"
                 },
                 "tax": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
@@ -1226,9 +1214,6 @@
                 "creatorId": {
                     "type": "string"
                 },
-                "displayTax": {
-                    "type": "string"
-                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1245,16 +1230,13 @@
                     "type": "string"
                 },
                 "tax": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
         "dtos.ParticipantItemResponse": {
             "type": "object",
             "properties": {
-                "displayPrice": {
-                    "type": "string"
-                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1268,7 +1250,7 @@
                     }
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "quantity": {
                     "type": "integer"
@@ -1279,10 +1261,7 @@
             "type": "object",
             "properties": {
                 "amountOwed": {
-                    "type": "integer"
-                },
-                "displayAmountOwed": {
-                    "type": "string"
+                    "type": "number"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1391,9 +1370,6 @@
         "dtos.UpdateBillItemResponse": {
             "type": "object",
             "properties": {
-                "displayPrice": {
-                    "type": "string"
-                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1407,7 +1383,7 @@
                     }
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "quantity": {
                     "type": "integer"
@@ -1431,10 +1407,7 @@
             "type": "object",
             "properties": {
                 "amountOwed": {
-                    "type": "integer"
-                },
-                "displayAmountOwed": {
-                    "type": "string"
+                    "type": "number"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1494,9 +1467,6 @@
                 "creatorId": {
                     "type": "string"
                 },
-                "displayTax": {
-                    "type": "string"
-                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1507,7 +1477,7 @@
                     "type": "string"
                 },
                 "tax": {
-                    "type": "integer"
+                    "type": "number"
                 }
             }
         },
