@@ -20,9 +20,10 @@ func CreateBillWithoutParticipant(req dtos.CreateBillWithoutParticipantRequest) 
 		return nil, fmt.Errorf("invalid billDate: %w", err)
 	}
 
+	billTaxInt := utils.FormatUSDtoInt(req.Tax + req.Service)
 	bill := models.Bill{
 		StoreName: req.StoreName,
-		Tax:       req.Tax + req.Service,
+		Tax:       billTaxInt,
 		CreatorID: req.CreatorID,
 		CreatedAt: time.Now(),
 		BillDate:  parsedDate,
@@ -59,17 +60,19 @@ func CreateBillWithoutParticipant(req dtos.CreateBillWithoutParticipantRequest) 
 	}
 
 	resp := &dtos.CreateBillWithoutParticipantResponse{
-		BillID:    bill.BillID,
-		StoreName: bill.StoreName,
-		BillDate:  bill.BillDate,
-		Tax:       req.Tax,
-		CreatedAt: bill.CreatedAt.Format(time.RFC3339),
-		CreatorID: bill.CreatorID,
-		Items:     itemResponses,
+		BillID:     bill.BillID,
+		StoreName:  bill.StoreName,
+		BillDate:   bill.BillDate,
+		Tax:        billTaxInt,
+		DisplayTax: utils.FormatUSD(billTaxInt),
+		CreatedAt:  bill.CreatedAt.Format(time.RFC3339),
+		CreatorID:  bill.CreatorID,
+		Items:      itemResponses,
 	}
 
 	return resp, nil
 }
+
 func GetBillsByCreator(creatorID string, billID string) ([]dtos.GetBillByCreatorResponse, error) {
 	if creatorID == "" {
 		return nil, errors.New("creatorId is required")
@@ -77,11 +80,9 @@ func GetBillsByCreator(creatorID string, billID string) ([]dtos.GetBillByCreator
 
 	var bills []models.Bill
 	query := database.DB.Preload("Items").Where("creator_id = ?", creatorID)
-
 	if billID != "" {
 		query = query.Where("bill_id = ?", billID)
 	}
-
 	if err := query.Find(&bills).Error; err != nil {
 		return nil, errors.New("failed to fetch bills: " + err.Error())
 	}
@@ -107,30 +108,39 @@ func GetBillsByCreator(creatorID string, billID string) ([]dtos.GetBillByCreator
 			}
 
 			totalItemPrice := item.Price * item.Quantity
-			itemTax := (float32(totalItemPrice) / float32(subTotal)) * bill.Tax
-			itemTotalWithTax := float32(totalItemPrice) + itemTax
 
+			itemTax := float64(totalItemPrice) / float64(subTotal) * float64(bill.Tax)
+			itemTotalWithTax := float64(totalItemPrice) + itemTax
+
+			remaining := int(math.Round(itemTotalWithTax))
 			numParticipants := len(participants)
-			amountPerParticipant := 0
-			if numParticipants > 0 {
-				amountPerParticipant = int(itemTotalWithTax) / numParticipants
-			}
 
 			var itemParticipantResponses []dtos.GetBillByCreatorParticipantResponse
-			for _, p := range participants {
-				pResp := dtos.GetBillByCreatorParticipantResponse{
-					ParticipantID:     p.ParticipantID,
-					AmountOwed:        amountPerParticipant,
-					DisplayAmountOwed: utils.FormatUSD(amountPerParticipant),
-					IsPaid:            p.IsPaid,
-				}
-				itemParticipantResponses = append(itemParticipantResponses, pResp)
+			if numParticipants > 0 {
+				amountPerParticipant := remaining / numParticipants
+				remainder := remaining % numParticipants
 
-				if existing, exists := participantMap[p.ParticipantID]; exists {
-					existing.AmountOwed += amountPerParticipant
-					participantMap[p.ParticipantID] = existing
-				} else {
-					participantMap[p.ParticipantID] = pResp
+				for i, p := range participants {
+					finalAmount := amountPerParticipant
+					if i < remainder {
+						finalAmount++
+					}
+
+					pResp := dtos.GetBillByCreatorParticipantResponse{
+						ParticipantID:     p.ParticipantID,
+						AmountOwed:        finalAmount,
+						DisplayAmountOwed: utils.FormatUSD(finalAmount),
+						IsPaid:            p.IsPaid,
+					}
+					itemParticipantResponses = append(itemParticipantResponses, pResp)
+
+					if existing, exists := participantMap[p.ParticipantID]; exists {
+						existing.AmountOwed += finalAmount
+						existing.DisplayAmountOwed = utils.FormatUSD(existing.AmountOwed)
+						participantMap[p.ParticipantID] = existing
+					} else {
+						participantMap[p.ParticipantID] = pResp
+					}
 				}
 			}
 
@@ -153,6 +163,7 @@ func GetBillsByCreator(creatorID string, billID string) ([]dtos.GetBillByCreator
 			BillID:       bill.BillID,
 			StoreName:    bill.StoreName,
 			Tax:          bill.Tax,
+			DisplayTax:   utils.FormatUSD(bill.Tax),
 			CreatedAt:    bill.CreatedAt.Format(time.RFC3339),
 			BillDate:     bill.BillDate,
 			Items:        itemResponses,
@@ -174,14 +185,24 @@ func AssignParticipantsToItem(req dtos.AssignParticipantsRequest) (*dtos.Assigne
 		return nil, errors.New("no participant IDs provided")
 	}
 
-	share := item.Price / len(req.ParticipantID)
+	totalPrice := item.Price * item.Quantity
+	numParticipants := len(req.ParticipantID)
+
+	share := totalPrice / numParticipants
+	remainder := totalPrice % numParticipants
+
 	var assigned []dtos.AssignedParticipant
 
-	for _, pid := range req.ParticipantID {
+	for i, pid := range req.ParticipantID {
+		amount := share
+		if i < remainder {
+			amount += 1
+		}
+
 		participant := models.Participant{
 			ParticipantID: pid,
 			ItemID:        item.ItemID,
-			AmountOwed:    share,
+			AmountOwed:    amount,
 			IsPaid:        false,
 		}
 
@@ -192,10 +213,9 @@ func AssignParticipantsToItem(req dtos.AssignParticipantsRequest) (*dtos.Assigne
 		assigned = append(assigned, dtos.AssignedParticipant{
 			ParticipantID: pid,
 			ItemID:        item.ItemID,
-			AmountOwed:    share,
+			AmountOwed:    amount,
 			IsPaid:        false,
 		})
-
 	}
 
 	resp := &dtos.AssignedParticipantResponse{
@@ -246,7 +266,6 @@ func GetBillsByParticipantID(participantID string) ([]dtos.ParticipantBillRespon
 		for _, item := range items {
 			subTotal += item.Price * item.Quantity
 		}
-
 		if subTotal == 0 {
 			continue
 		}
@@ -258,24 +277,31 @@ func GetBillsByParticipantID(participantID string) ([]dtos.ParticipantBillRespon
 			}
 
 			totalItemPrice := item.Price * item.Quantity
-			itemTax := (float32(totalItemPrice) / float32(subTotal)) * bill.Tax
-			itemTotalWithTax := float32(totalItemPrice) + itemTax
+			itemTax := float64(totalItemPrice) / float64(subTotal) * float64(bill.Tax)
+			itemTotalWithTax := float64(totalItemPrice) + itemTax
+			totalRounded := int(math.Round(itemTotalWithTax))
 
 			numParticipants := len(participants)
-			amountPerParticipant := 0
-			if numParticipants > 0 {
-				amountPerParticipant = int(itemTotalWithTax) / numParticipants
-			}
-
 			var participantResponses []dtos.ParticipantListResponse
-			for _, p := range participants {
-				participantResponses = append(participantResponses, dtos.ParticipantListResponse{
-					ParticipantID:     p.ParticipantID,
-					AmountOwed:        amountPerParticipant,
-					DisplayAmountOwed: utils.FormatUSD(amountPerParticipant),
-					IsPaid:            p.IsPaid,
-				})
-				globalParticipantMap[p.ParticipantID] += amountPerParticipant
+
+			if numParticipants > 0 {
+				amountPerParticipant := totalRounded / numParticipants
+				remainder := totalRounded % numParticipants
+
+				for i, p := range participants {
+					finalAmount := amountPerParticipant
+					if i < remainder {
+						finalAmount++
+					}
+
+					participantResponses = append(participantResponses, dtos.ParticipantListResponse{
+						ParticipantID:     p.ParticipantID,
+						AmountOwed:        finalAmount,
+						DisplayAmountOwed: utils.FormatUSD(finalAmount),
+						IsPaid:            p.IsPaid,
+					})
+					globalParticipantMap[p.ParticipantID] += finalAmount
+				}
 			}
 
 			itemDTOs = append(itemDTOs, dtos.ParticipantItemResponse{
@@ -289,30 +315,29 @@ func GetBillsByParticipantID(participantID string) ([]dtos.ParticipantBillRespon
 		}
 
 		var globalParticipants []dtos.ParticipantListResponse
-		for participantID, totalAmount := range globalParticipantMap {
+		for pid, totalAmount := range globalParticipantMap {
 			var p models.Participant
-			_ = database.DB.Where("participant_id = ?", participantID).First(&p).Error
+			_ = database.DB.Where("participant_id = ?", pid).First(&p).Error
 
 			globalParticipants = append(globalParticipants, dtos.ParticipantListResponse{
-				ParticipantID:     participantID,
+				ParticipantID:     pid,
 				AmountOwed:        totalAmount,
 				DisplayAmountOwed: utils.FormatUSD(totalAmount),
 				IsPaid:            p.IsPaid,
 			})
 		}
 
-		response := dtos.ParticipantBillResponse{
+		responses = append(responses, dtos.ParticipantBillResponse{
 			BillID:       bill.BillID,
 			StoreName:    bill.StoreName,
 			CreatorID:    bill.CreatorID,
 			BillDate:     bill.BillDate,
 			CreatedAt:    bill.CreatedAt.Format(time.RFC3339),
 			Tax:          bill.Tax,
+			DisplayTax:   utils.FormatUSD(bill.Tax),
 			Items:        itemDTOs,
 			Participants: globalParticipants,
-		}
-
-		responses = append(responses, response)
+		})
 	}
 
 	return responses, nil
@@ -335,7 +360,6 @@ func GetBillByBIllID(billID string) (dtos.ParticipantBillResponse, error) {
 	for _, item := range bill.Items {
 		subTotal += item.Price * item.Quantity
 	}
-
 	if subTotal == 0 {
 		return dtos.ParticipantBillResponse{}, errors.New("subtotal is 0, cannot calculate tax")
 	}
@@ -346,27 +370,32 @@ func GetBillByBIllID(billID string) (dtos.ParticipantBillResponse, error) {
 			return dtos.ParticipantBillResponse{}, errors.New("failed to get participants: " + err.Error())
 		}
 
-		itemTotal := item.Price * item.Quantity
-
-		itemTax := (float32(itemTotal) / float32(subTotal)) * bill.Tax
-		itemTotalWithTax := float32(itemTotal) + itemTax
+		totalItemPrice := item.Price * item.Quantity
+		itemTax := float64(totalItemPrice) / float64(subTotal) * float64(bill.Tax)
+		itemTotalWithTax := float64(totalItemPrice) + itemTax
+		totalRounded := int(math.Round(itemTotalWithTax))
 
 		numParticipants := len(participants)
-		amountPerParticipant := 0
-		if numParticipants > 0 {
-			amountPerParticipant = int(itemTotalWithTax) / numParticipants
-		}
-
 		var participantResponses []dtos.ParticipantListResponse
-		for _, p := range participants {
-			participantResponses = append(participantResponses, dtos.ParticipantListResponse{
-				ParticipantID:     p.ParticipantID,
-				AmountOwed:        amountPerParticipant,
-				DisplayAmountOwed: utils.FormatUSD(amountPerParticipant),
-				IsPaid:            p.IsPaid,
-			})
 
-			globalParticipantMap[p.ParticipantID] += amountPerParticipant
+		if numParticipants > 0 {
+			amountPerParticipant := totalRounded / numParticipants
+			remainder := totalRounded % numParticipants
+
+			for i, p := range participants {
+				finalAmount := amountPerParticipant
+				if i < remainder {
+					finalAmount++
+				}
+
+				participantResponses = append(participantResponses, dtos.ParticipantListResponse{
+					ParticipantID:     p.ParticipantID,
+					AmountOwed:        finalAmount,
+					DisplayAmountOwed: utils.FormatUSD(finalAmount),
+					IsPaid:            p.IsPaid,
+				})
+				globalParticipantMap[p.ParticipantID] += finalAmount
+			}
 		}
 
 		itemResponses = append(itemResponses, dtos.ParticipantItemResponse{
@@ -399,6 +428,7 @@ func GetBillByBIllID(billID string) (dtos.ParticipantBillResponse, error) {
 		BillDate:     bill.BillDate,
 		CreatedAt:    bill.CreatedAt.Format(time.RFC3339),
 		Tax:          bill.Tax,
+		DisplayTax:   utils.FormatUSD(bill.Tax),
 		Items:        itemResponses,
 		Participants: globalParticipants,
 	}
@@ -454,11 +484,12 @@ func UpdateBillService(req dtos.UpdateBillRequest) (dtos.UpdateBillResponse, err
 	}
 	_ = database.DB.Where("bill_id = ?", bill.BillID).Delete(&models.Item{}).Error
 
+	// Update bill
 	bill.StoreName = req.StoreName
 	bill.CreatorID = req.CreatorID
 	bill.CreatedAt = time.Now()
 	bill.BillDate = req.BillDate
-	bill.Tax = req.Tax
+	bill.Tax = utils.FormatUSDtoInt(req.Tax)
 	if err := database.DB.Save(&bill).Error; err != nil {
 		return dtos.UpdateBillResponse{}, err
 	}
@@ -484,9 +515,10 @@ func UpdateBillService(req dtos.UpdateBillRequest) (dtos.UpdateBillResponse, err
 		itemTax := 0.0
 		if subTotal > 0 {
 			proportion := float64(totalItemPrice) / float64(subTotal)
-			itemTax = float64(bill.Tax) * proportion
+			itemTax = proportion * float64(bill.Tax)
 		}
-		itemTotalWithTax := float64(totalItemPrice) * (1 + itemTax/100)
+		itemTotalWithTax := float64(totalItemPrice) + itemTax
+		itemTotalRounded := int(math.Round(itemTotalWithTax))
 
 		newItem := models.Item{
 			ItemID:   itemID,
@@ -503,16 +535,17 @@ func UpdateBillService(req dtos.UpdateBillRequest) (dtos.UpdateBillResponse, err
 		participants := item.UpdateBillParticipantRequest
 		numParticipants := len(participants)
 
-		remaining := int(math.Round(itemTotalWithTax))
-		baseAmount := 0
+		amountPerParticipant := 0
+		remainder := 0
 		if numParticipants > 0 {
-			baseAmount = remaining / numParticipants
+			amountPerParticipant = itemTotalRounded / numParticipants
+			remainder = itemTotalRounded % numParticipants
 		}
 
 		for i, p := range participants {
-			amount := baseAmount
-			if i == 0 {
-				amount += remaining - (baseAmount * numParticipants)
+			amount := amountPerParticipant
+			if i < remainder {
+				amount++
 			}
 
 			newParticipant := models.Participant{
@@ -550,6 +583,7 @@ func UpdateBillService(req dtos.UpdateBillRequest) (dtos.UpdateBillResponse, err
 		CreatedAt:              bill.CreatedAt,
 		BillDate:               bill.BillDate,
 		Tax:                    bill.Tax,
+		DisplayTax:             utils.FormatUSD(bill.Tax),
 		UpdateBillItemResponse: itemResponses,
 	}, nil
 }

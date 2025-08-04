@@ -8,7 +8,8 @@ type ParticipantBillResponse struct {
 	CreatorID    string                    `json:"creatorId"`
 	BillDate     time.Time                 `json:"billDate"`
 	CreatedAt    string                    `json:"createdAt"`
-	Tax          float32                   `json:"tax"`
+	Tax          int                       `json:"tax"`
+	DisplayTax   string                    `json:"displayTax"`
 	Items        []ParticipantItemResponse `json:"items"`
 	Participants []ParticipantListResponse `json:"participants"`
 }

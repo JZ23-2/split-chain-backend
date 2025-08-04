@@ -15,7 +15,7 @@ type Bill struct {
 	Creator   User      `gorm:"foreignKey:CreatorID" json:"creator"`
 	CreatedAt time.Time `json:"createdAt"`
 	BillDate  time.Time `json:"billDate"`
-	Tax       float32   `json:"tax"`
+	Tax       int       `json:"tax"`
 	Items     []Item    `gorm:"foreignKey:BillID;references:BillID" json:"items"`
 }
 

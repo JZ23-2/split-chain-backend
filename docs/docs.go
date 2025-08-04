@@ -1060,6 +1060,9 @@ const docTemplate = `{
                 "creatorId": {
                     "type": "string"
                 },
+                "displayTax": {
+                    "type": "string"
+                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1070,7 +1073,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tax": {
-                    "type": "number"
+                    "type": "integer"
                 }
             }
         },
@@ -1194,6 +1197,9 @@ const docTemplate = `{
                 "createdAt": {
                     "type": "string"
                 },
+                "displayTax": {
+                    "type": "string"
+                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1210,7 +1216,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tax": {
-                    "type": "number"
+                    "type": "integer"
                 }
             }
         },
@@ -1229,6 +1235,9 @@ const docTemplate = `{
                 "creatorId": {
                     "type": "string"
                 },
+                "displayTax": {
+                    "type": "string"
+                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1245,7 +1254,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tax": {
-                    "type": "number"
+                    "type": "integer"
                 }
             }
         },
@@ -1494,6 +1503,9 @@ const docTemplate = `{
                 "creatorId": {
                     "type": "string"
                 },
+                "displayTax": {
+                    "type": "string"
+                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1504,7 +1516,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tax": {
-                    "type": "number"
+                    "type": "integer"
                 }
             }
         },

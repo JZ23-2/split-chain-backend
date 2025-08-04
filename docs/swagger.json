@@ -1051,6 +1051,9 @@
                 "creatorId": {
                     "type": "string"
                 },
+                "displayTax": {
+                    "type": "string"
+                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1061,7 +1064,7 @@
                     "type": "string"
                 },
                 "tax": {
-                    "type": "number"
+                    "type": "integer"
                 }
             }
         },
@@ -1185,6 +1188,9 @@
                 "createdAt": {
                     "type": "string"
                 },
+                "displayTax": {
+                    "type": "string"
+                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1201,7 +1207,7 @@
                     "type": "string"
                 },
                 "tax": {
-                    "type": "number"
+                    "type": "integer"
                 }
             }
         },
@@ -1220,6 +1226,9 @@
                 "creatorId": {
                     "type": "string"
                 },
+                "displayTax": {
+                    "type": "string"
+                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1236,7 +1245,7 @@
                     "type": "string"
                 },
                 "tax": {
-                    "type": "number"
+                    "type": "integer"
                 }
             }
         },
@@ -1485,6 +1494,9 @@
                 "creatorId": {
                     "type": "string"
                 },
+                "displayTax": {
+                    "type": "string"
+                },
                 "items": {
                     "type": "array",
                     "items": {
@@ -1495,7 +1507,7 @@
                     "type": "string"
                 },
                 "tax": {
-                    "type": "number"
+                    "type": "integer"
                 }
             }
         },

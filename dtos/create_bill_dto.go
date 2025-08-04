@@ -52,8 +52,8 @@ type CreateBillWithoutParticipantItemRequest struct {
 type CreateBillWithoutParticipantRequest struct {
 	StoreName string                                    `json:"storeName" example:"East Repair Inc."`
 	BillDate  string                                    `json:"billDate" example:"2019-11-02"`
-	Tax       float32                                   `json:"tax" example:"9.06"`
-	Service   float32                                   `json:"service" example:"0.0"`
+	Tax       float64                                   `json:"tax" example:"9.06"`
+	Service   float64                                   `json:"service" example:"0.0"`
 	CreatorID string                                    `json:"creatorId" example:"user123"`
 	Items     []CreateBillWithoutParticipantItemRequest `json:"items"`
 }
@@ -67,13 +67,14 @@ type CreateBillWithoutParticipantItemResponse struct {
 }
 
 type CreateBillWithoutParticipantResponse struct {
-	BillID    string                                     `json:"billId"`
-	StoreName string                                     `json:"storeName"`
-	BillDate  time.Time                                  `json:"billDate"`
-	Tax       float32                                    `json:"tax"`
-	CreatedAt string                                     `json:"createdAt"`
-	CreatorID string                                     `json:"creatorId"`
-	Items     []CreateBillWithoutParticipantItemResponse `json:"items"`
+	BillID     string                                     `json:"billId"`
+	StoreName  string                                     `json:"storeName"`
+	BillDate   time.Time                                  `json:"billDate"`
+	Tax        int                                        `json:"tax"`
+	DisplayTax string                                     `json:"displayTax"`
+	CreatedAt  string                                     `json:"createdAt"`
+	CreatorID  string                                     `json:"creatorId"`
+	Items      []CreateBillWithoutParticipantItemResponse `json:"items"`
 }
 
 type GetBillByCreatorItemResponse struct {
@@ -95,7 +96,8 @@ type GetBillByCreatorParticipantResponse struct {
 type GetBillByCreatorResponse struct {
 	BillID       string                                `json:"billId"`
 	StoreName    string                                `json:"storeName"`
-	Tax          float32                               `json:"tax"`
+	Tax          int                                   `json:"tax"`
+	DisplayTax   string                                `json:"displayTax"`
 	CreatedAt    string                                `json:"createdAt"`
 	BillDate     time.Time                             `json:"billDate"`
 	Items        []GetBillByCreatorItemResponse        `json:"items"`

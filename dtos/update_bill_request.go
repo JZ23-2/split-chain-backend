@@ -21,7 +21,7 @@ type UpdateBillRequest struct {
 	CreatorID             string                  `json:"creatorId" example:"user-123"`
 	CreatedAt             time.Time               `json:"createdAt" example:"2025-07-31T15:04:05Z"`
 	BillDate              time.Time               `json:"billDate" example:"2025-07-30T00:00:00Z"`
-	Tax                   float32                 `json:"tax" example:"10.0"`
+	Tax                   float64                 `json:"tax" example:"10.0"`
 	UpdateBillItemRequest []UpdateBillItemRequest `json:"items"`
 }
 
@@ -47,6 +47,7 @@ type UpdateBillResponse struct {
 	CreatorID              string                   `json:"creatorId"`
 	CreatedAt              time.Time                `json:"createdAt"`
 	BillDate               time.Time                `json:"billDate"`
-	Tax                    float32                  `json:"tax"`
+	Tax                    int                      `json:"tax"`
+	DisplayTax             string                   `json:"displayTax"`
 	UpdateBillItemResponse []UpdateBillItemResponse `json:"items"`
 }
