@@ -484,7 +484,6 @@ func UpdateBillService(req dtos.UpdateBillRequest) (dtos.UpdateBillResponse, err
 	}
 	_ = database.DB.Where("bill_id = ?", bill.BillID).Delete(&models.Item{}).Error
 
-	// Update bill
 	bill.StoreName = req.StoreName
 	bill.CreatorID = req.CreatorID
 	bill.CreatedAt = time.Now()
