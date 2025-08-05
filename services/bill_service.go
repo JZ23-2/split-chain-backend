@@ -8,6 +8,7 @@ import (
 
 	"github.com/JZ23-2/splitbill-backend/database"
 	"github.com/JZ23-2/splitbill-backend/dtos"
+	"github.com/JZ23-2/splitbill-backend/handlers"
 	"github.com/JZ23-2/splitbill-backend/models"
 	"github.com/JZ23-2/splitbill-backend/utils"
 	"github.com/google/uuid"
@@ -483,6 +484,17 @@ func UpdateBillService(req dtos.UpdateBillRequest) (dtos.UpdateBillResponse, err
 		return dtos.UpdateBillResponse{}, err
 	}
 
+	var oldParticipants []models.Participant
+	_ = database.DB.Table("participants").
+		Joins("JOIN items ON participants.item_id = items.item_id").
+		Where("items.bill_id = ?", bill.BillID).
+		Find(&oldParticipants)
+
+	existingParticipantMap := make(map[string]bool)
+	for _, p := range oldParticipants {
+		existingParticipantMap[p.ParticipantID] = true
+	}
+
 	var existingItems []models.Item
 	if err := database.DB.Where("bill_id = ?", bill.BillID).Find(&existingItems).Error; err != nil {
 		return dtos.UpdateBillResponse{}, err
@@ -507,6 +519,9 @@ func UpdateBillService(req dtos.UpdateBillRequest) (dtos.UpdateBillResponse, err
 	for _, item := range req.UpdateBillItemRequest {
 		subTotal += utils.FormatUSDtoInt(item.Price)
 	}
+
+	notifiedParticipants := make(map[string]bool)
+	paidNotificationSent := make(map[string]bool)
 
 	for _, item := range req.UpdateBillItemRequest {
 		var itemID string
@@ -563,6 +578,33 @@ func UpdateBillService(req dtos.UpdateBillRequest) (dtos.UpdateBillResponse, err
 			}
 			if err := database.DB.Save(&newParticipant).Error; err != nil {
 				return dtos.UpdateBillResponse{}, err
+			}
+
+			if p.ParticipantID != bill.CreatorID &&
+				!existingParticipantMap[p.ParticipantID] &&
+				p.IsPaid == "" &&
+				!notifiedParticipants[p.ParticipantID] {
+
+				handlers.SendInboxToUser(
+					p.ParticipantID,
+					fmt.Sprintf("You have been assigned in a bill: %s", bill.StoreName),
+					"/participated-bills",
+					"bill_assigned",
+				)
+				notifiedParticipants[p.ParticipantID] = true
+			}
+
+			if p.IsPaid != "" &&
+				p.ParticipantID != bill.CreatorID &&
+				!paidNotificationSent[p.ParticipantID] {
+
+				handlers.SendInboxToUser(
+					bill.CreatorID,
+					fmt.Sprintf("Participant %s has paid their part in bill: %s", p.ParticipantID, bill.StoreName),
+					"/created-bills",
+					"participant_paid",
+				)
+				paidNotificationSent[p.ParticipantID] = true
 			}
 
 			participantResponses = append(participantResponses, dtos.UpdateBillParticipantResponse{

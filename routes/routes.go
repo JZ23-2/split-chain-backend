@@ -35,6 +35,8 @@ func SetUpRoutes() {
 		ExchangeRateRoute(api)
 		FriendRoutes(api)
 		PaymentRoutes(api)
+		WebsocketRoutes(api)
+		InboxRoutes(api)
 	}
 
 	r.Run(":8080")

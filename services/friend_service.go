@@ -2,9 +2,11 @@ package services
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/JZ23-2/splitbill-backend/database"
 	"github.com/JZ23-2/splitbill-backend/dtos"
+	"github.com/JZ23-2/splitbill-backend/handlers"
 	"github.com/JZ23-2/splitbill-backend/models"
 	"gorm.io/gorm"
 )
@@ -53,6 +55,8 @@ func AcceptFriendRequestService(req dtos.AcceptFriendRequest) (dtos.AcceptFriend
 		Nickname:            &friend2.Nickname,
 	}
 
+	handlers.SendInboxToUser(friend1.FriendWalletAddress, fmt.Sprintf("%s accepted your friend request", friend1.UserWalletAddress), "/friends", "accept_friend")
+
 	return resp1, resp2, nil
 }
 
@@ -74,6 +78,8 @@ func DeclineFriendRequestService(req dtos.DeclineFriendRequest) (dtos.DeclineFri
 		FriendWalletAddress: pending.FriendWalletAddress,
 		Status:              pending.Status,
 	}
+
+	handlers.SendInboxToUser(response.UserWalletAddress, fmt.Sprintf("%s declined your friend request", pending.FriendWalletAddress), "/friends", "decline_request")
 
 	return response, nil
 
@@ -102,6 +108,14 @@ func AddFriendRequestService(req dtos.AddFriendRequest) (any, string, int, error
 		if err := database.DB.Save(&declinedRequest).Error; err != nil {
 			return nil, "Failed to re-activate declined request", 500, err
 		}
+
+		handlers.SendInboxToUser(
+			req.FriendWalletAddress,
+			fmt.Sprintf("%s sent you a friend request", req.UserWalletAddress),
+			"/friends",
+			"friend_request",
+		)
+
 		return declinedRequest, "Friend request re-activated", 200, nil
 	}
 
@@ -175,6 +189,13 @@ func AddFriendRequestService(req dtos.AddFriendRequest) (any, string, int, error
 	if err := database.DB.Create(&newRequest).Error; err != nil {
 		return nil, "Failed to create friend request", 500, err
 	}
+
+	handlers.SendInboxToUser(
+		newRequest.FriendWalletAddress,
+		fmt.Sprintf("%s sent you a friend request", newRequest.UserWalletAddress),
+		"/friends",
+		"friend_request",
+	)
 
 	response := dtos.AddFriendResponse{
 		ID:                  newRequest.ID,
