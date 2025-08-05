@@ -197,7 +197,7 @@ func AssignParticipantsToItem(req dtos.AssignParticipantsRequest) (*dtos.Assigne
 		return nil, errors.New("subtotal is zero, cannot assign tax")
 	}
 
-	itemTax := float64(item.Price) / float64(subTotal) * float64(bill.Tax) / 100.0
+	itemTax := (float64(item.Price) / float64(subTotal)) * float64(bill.Tax)
 	itemTotalWithTax := float64(item.Price) + itemTax
 
 	remaining := int(math.Round(itemTotalWithTax))
