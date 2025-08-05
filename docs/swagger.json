@@ -938,7 +938,7 @@
             "type": "object",
             "properties": {
                 "amountOwed": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1130,9 +1130,6 @@
         "dtos.GetBillByCreatorItemResponse": {
             "type": "object",
             "properties": {
-                "displayPrice": {
-                    "type": "string"
-                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1146,7 +1143,7 @@
                     }
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "quantity": {
                     "type": "integer"

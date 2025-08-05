@@ -947,7 +947,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "amountOwed": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "isPaid": {
                     "type": "boolean"
@@ -1139,9 +1139,6 @@ const docTemplate = `{
         "dtos.GetBillByCreatorItemResponse": {
             "type": "object",
             "properties": {
-                "displayPrice": {
-                    "type": "string"
-                },
                 "itemId": {
                     "type": "string"
                 },
@@ -1155,7 +1152,7 @@ const docTemplate = `{
                     }
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
                 },
                 "quantity": {
                     "type": "integer"

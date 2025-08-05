@@ -78,8 +78,7 @@ type CreateBillWithoutParticipantResponse struct {
 type GetBillByCreatorItemResponse struct {
 	ItemID       string                                `json:"itemId"`
 	Name         string                                `json:"name"`
-	Price        int                                   `json:"price"`
-	DisplayPrice string                                `json:"displayPrice"`
+	Price        float64                               `json:"price"`
 	Quantity     int                                   `json:"quantity"`
 	Participants []GetBillByCreatorParticipantResponse `json:"participants"`
 }

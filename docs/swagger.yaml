@@ -54,7 +54,7 @@ definitions:
   dtos.AssignedParticipant:
     properties:
       amountOwed:
-        type: integer
+        type: number
       isPaid:
         type: boolean
       itemId:
@@ -182,8 +182,6 @@ definitions:
     type: object
   dtos.GetBillByCreatorItemResponse:
     properties:
-      displayPrice:
-        type: string
       itemId:
         type: string
       name:
@@ -193,7 +191,7 @@ definitions:
           $ref: '#/definitions/dtos.GetBillByCreatorParticipantResponse'
         type: array
       price:
-        type: integer
+        type: number
       quantity:
         type: integer
     type: object

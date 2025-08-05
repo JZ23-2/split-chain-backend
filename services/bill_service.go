@@ -93,7 +93,7 @@ func GetBillsByCreator(creatorID string, billID string) ([]dtos.GetBillByCreator
 
 		subTotal := 0
 		for _, item := range bill.Items {
-			subTotal += item.Price * item.Quantity
+			subTotal += item.Price
 		}
 		if subTotal == 0 {
 			continue
@@ -105,9 +105,10 @@ func GetBillsByCreator(creatorID string, billID string) ([]dtos.GetBillByCreator
 				return nil, errors.New("failed to fetch participants: " + err.Error())
 			}
 
-			totalItemPrice := item.Price * item.Quantity
+			totalItemPrice := item.Price
 
-			itemTax := float64(totalItemPrice) / float64(subTotal) * float64(bill.Tax)
+			itemTax := float64(totalItemPrice) / float64(subTotal) * float64(bill.Tax) / 100.0
+
 			itemTotalWithTax := float64(totalItemPrice) + itemTax
 
 			remaining := int(math.Round(itemTotalWithTax))
@@ -143,9 +144,8 @@ func GetBillsByCreator(creatorID string, billID string) ([]dtos.GetBillByCreator
 			itemResponses = append(itemResponses, dtos.GetBillByCreatorItemResponse{
 				ItemID:       item.ItemID,
 				Name:         item.Name,
-				Price:        item.Price,
+				Price:        float64(item.Price) / 100.0,
 				Quantity:     item.Quantity,
-				DisplayPrice: utils.FormatUSD(item.Price),
 				Participants: itemParticipantResponses,
 			})
 		}
@@ -189,17 +189,16 @@ func AssignParticipantsToItem(req dtos.AssignParticipantsRequest) (*dtos.Assigne
 		return nil, errors.New("failed to fetch items for tax calculation")
 	}
 
-	subTotal := 0
+	var subTotal int
 	for _, i := range allItems {
-		subTotal += i.Price * i.Quantity
+		subTotal += i.Price
 	}
 	if subTotal == 0 {
 		return nil, errors.New("subtotal is zero, cannot assign tax")
 	}
 
-	totalItemPrice := item.Price * item.Quantity
-	itemTax := float64(totalItemPrice) / float64(subTotal) * float64(bill.Tax)
-	itemTotalWithTax := float64(totalItemPrice) + itemTax
+	itemTax := float64(item.Price) / float64(subTotal) * float64(bill.Tax) / 100.0
+	itemTotalWithTax := float64(item.Price) + itemTax
 
 	remaining := int(math.Round(itemTotalWithTax))
 	numParticipants := len(req.ParticipantID)
@@ -229,7 +228,7 @@ func AssignParticipantsToItem(req dtos.AssignParticipantsRequest) (*dtos.Assigne
 		assigned = append(assigned, dtos.AssignedParticipant{
 			ParticipantID: pid,
 			ItemID:        item.ItemID,
-			AmountOwed:    amount,
+			AmountOwed:    float64(amount) / 100.0,
 			IsPaid:        false,
 		})
 	}
@@ -280,7 +279,7 @@ func GetBillsByParticipantID(participantID string) ([]dtos.ParticipantBillRespon
 
 		subTotal := 0
 		for _, item := range items {
-			subTotal += item.Price * item.Quantity
+			subTotal += item.Price
 		}
 		if subTotal == 0 {
 			continue
@@ -292,8 +291,9 @@ func GetBillsByParticipantID(participantID string) ([]dtos.ParticipantBillRespon
 				continue
 			}
 
-			totalItemPrice := item.Price * item.Quantity
-			itemTax := float64(totalItemPrice) / float64(subTotal) * float64(bill.Tax)
+			totalItemPrice := item.Price
+
+			itemTax := float64(totalItemPrice) / float64(subTotal) * float64(bill.Tax) / 100.0
 			itemTotalWithTax := float64(totalItemPrice) + itemTax
 			totalRounded := int(math.Round(itemTotalWithTax))
 
@@ -370,7 +370,7 @@ func GetBillByBIllID(billID string) (dtos.ParticipantBillResponse, error) {
 
 	var subTotal int
 	for _, item := range bill.Items {
-		subTotal += item.Price * item.Quantity
+		subTotal += item.Price
 	}
 	if subTotal == 0 {
 		return dtos.ParticipantBillResponse{}, errors.New("subtotal is 0, cannot calculate tax")
@@ -382,8 +382,8 @@ func GetBillByBIllID(billID string) (dtos.ParticipantBillResponse, error) {
 			return dtos.ParticipantBillResponse{}, errors.New("failed to get participants: " + err.Error())
 		}
 
-		totalItemPrice := item.Price * item.Quantity
-		itemTax := float64(totalItemPrice) / float64(subTotal) * float64(bill.Tax)
+		totalItemPrice := item.Price
+		itemTax := float64(totalItemPrice) / float64(subTotal) * float64(bill.Tax) / 100.0
 		itemTotalWithTax := float64(totalItemPrice) + itemTax
 		totalRounded := int(math.Round(itemTotalWithTax))
 
@@ -505,7 +505,7 @@ func UpdateBillService(req dtos.UpdateBillRequest) (dtos.UpdateBillResponse, err
 	subTotal := 0
 
 	for _, item := range req.UpdateBillItemRequest {
-		subTotal += utils.FormatUSDtoInt(item.Price) * item.Quantity
+		subTotal += utils.FormatUSDtoInt(item.Price)
 	}
 
 	for _, item := range req.UpdateBillItemRequest {
@@ -517,12 +517,12 @@ func UpdateBillService(req dtos.UpdateBillRequest) (dtos.UpdateBillResponse, err
 		}
 
 		priceInt := utils.FormatUSDtoInt(item.Price)
-		totalItemPrice := priceInt * item.Quantity
+		totalItemPrice := priceInt
 
 		itemTax := 0.0
 		if subTotal > 0 {
 			proportion := float64(totalItemPrice) / float64(subTotal)
-			itemTax = proportion * float64(bill.Tax)
+			itemTax = proportion * float64(bill.Tax) / 100.9
 		}
 		itemTotalWithTax := float64(totalItemPrice) + itemTax
 		itemTotalRounded := int(math.Round(itemTotalWithTax))
