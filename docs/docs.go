@@ -355,7 +355,7 @@ const docTemplate = `{
             }
         },
         "/bills/update-bill": {
-            "patch": {
+            "put": {
                 "description": "Update Bill",
                 "produces": [
                     "application/json"

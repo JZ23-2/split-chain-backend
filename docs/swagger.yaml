@@ -647,7 +647,7 @@ paths:
       tags:
       - Bill
   /bills/update-bill:
-    patch:
+    put:
       description: Update Bill
       parameters:
       - description: Bill Data
