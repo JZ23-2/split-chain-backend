@@ -24,5 +24,5 @@ type ParticipantItemResponse struct {
 type ParticipantListResponse struct {
 	ParticipantID string  `json:"participantId"`
 	AmountOwed    float64 `json:"amountOwed"`
-	IsPaid        bool    `json:"isPaid"`
+	IsPaid        string    `json:"isPaid"`
 }

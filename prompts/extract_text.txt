@@ -17,3 +17,4 @@ Extract structured info from this receipt image and return JSON only in this for
 - All monetary values (price, tax, and service) must be returned in USD format as floating point numbers (e.g., 19.99).
 - If a price ends with ".00", you can include the decimal part.
 - Only respond with JSON. Use `null` for any missing or unclear values.
+- If there is unit price and total, pick the total instead of unit price

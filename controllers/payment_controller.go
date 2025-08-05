@@ -17,7 +17,7 @@ import (
 //	@Success		200	{object}	map[string]interface{}
 //	@Router			/confirm-payment [get]
 func ConfirmTransaction(c *gin.Context) {
-	rawTxID := "0.0.6357764@1752648750.206207259"
+	rawTxID := "0.0.6407351@1754380355.421096267"
 
 	mirrorTxID, err := utils.ConvertToMirrorTxID(rawTxID)
 	if err != nil {

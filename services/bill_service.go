@@ -218,7 +218,7 @@ func AssignParticipantsToItem(req dtos.AssignParticipantsRequest) (*dtos.Assigne
 			ParticipantID: pid,
 			ItemID:        item.ItemID,
 			AmountOwed:    amount,
-			IsPaid:        false,
+			IsPaid:        "",
 		}
 
 		if err := database.DB.Create(&participant).Error; err != nil {

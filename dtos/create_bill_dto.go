@@ -86,7 +86,7 @@ type GetBillByCreatorItemResponse struct {
 type GetBillByCreatorParticipantResponse struct {
 	ParticipantID string  `json:"participantId"`
 	AmountOwed    float64 `json:"amountOwed"`
-	IsPaid        bool    `json:"isPaid"`
+	IsPaid        string    `json:"isPaid"`
 }
 
 type GetBillByCreatorResponse struct {

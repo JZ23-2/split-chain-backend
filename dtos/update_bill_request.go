@@ -4,7 +4,7 @@ import "time"
 
 type UpdateBillParticipantRequest struct {
 	ParticipantID string `json:"participantId" example:"u123"`
-	IsPaid        bool   `json:"isPaid" example:"false"`
+	IsPaid        string   `json:"isPaid" example:""`
 }
 
 type UpdateBillItemRequest struct {
@@ -28,7 +28,7 @@ type UpdateBillRequest struct {
 type UpdateBillParticipantResponse struct {
 	ParticipantID string  `json:"participantId"`
 	AmountOwed    float64 `json:"amountOwed"`
-	IsPaid        bool    `json:"isPaid"`
+	IsPaid        string    `json:"isPaid"`
 }
 
 type UpdateBillItemResponse struct {
