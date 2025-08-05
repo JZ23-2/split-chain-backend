@@ -26,7 +26,6 @@ func SetUpRoutes() {
 	api := r.Group("/api/v1")
 	{
 		r.GET("api/v1/check", controllers.CheckHealth)
-		r.GET("api/v1/confirm-payment", controllers.ConfirmTransaction)
 
 		UserRoutes(api)
 		fmt.Println("logging here")
@@ -35,6 +34,7 @@ func SetUpRoutes() {
 		ReceiptRoute(api)
 		ExchangeRateRoute(api)
 		FriendRoutes(api)
+		PaymentRoutes(api)
 	}
 
 	r.Run(":8080")

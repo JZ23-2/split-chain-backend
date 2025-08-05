@@ -10,16 +10,20 @@ import (
 )
 
 // ConfirmTransaction godoc
+//
 //	@Summary		Example confirm a payment
 //	@Description	example return confirms a payment on Hedera
 //	@Tags			Payment
 //	@Produce		json
+//
+// @Param transactionId path string true "Transaction ID in format '0.0.xxxx@seconds.nanos'"
+//
 //	@Success		200	{object}	map[string]interface{}
-//	@Router			/confirm-payment [get]
+//	@Router			/payments/confirm-payment/{transactionId} [get]
 func ConfirmTransaction(c *gin.Context) {
-	rawTxID := "0.0.6407351@1754380355.421096267"
+	transactionId := c.Param("transactionId")
 
-	mirrorTxID, err := utils.ConvertToMirrorTxID(rawTxID)
+	mirrorTxID, err := utils.ConvertToMirrorTxID(transactionId)
 	if err != nil {
 		fmt.Println("❌ Error:", err)
 	}

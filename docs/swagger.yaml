@@ -200,7 +200,7 @@ definitions:
       amountOwed:
         type: number
       isPaid:
-        type: boolean
+        type: string
       participantId:
         type: string
     type: object
@@ -268,7 +268,7 @@ definitions:
       amountOwed:
         type: number
       isPaid:
-        type: boolean
+        type: string
       participantId:
         type: string
     type: object
@@ -356,8 +356,8 @@ definitions:
   dtos.UpdateBillParticipantRequest:
     properties:
       isPaid:
-        example: false
-        type: boolean
+        example: ""
+        type: string
       participantId:
         example: u123
         type: string
@@ -367,7 +367,7 @@ definitions:
       amountOwed:
         type: number
       isPaid:
-        type: boolean
+        type: string
       participantId:
         type: string
     type: object
@@ -647,7 +647,7 @@ paths:
       tags:
       - Bill
   /bills/update-bill:
-    put:
+    patch:
       description: Update Bill
       parameters:
       - description: Bill Data
@@ -684,20 +684,6 @@ paths:
             additionalProperties: true
             type: object
       summary: Check backend health
-      tags:
-      - Payment
-  /confirm-payment:
-    get:
-      description: example return confirms a payment on Hedera
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Example confirm a payment
       tags:
       - Payment
   /friends/{user_wallet_address}:
@@ -912,6 +898,26 @@ paths:
       summary: Get HBAR Rate (1 USD)
       tags:
       - Rate
+  /payments/confirm-payment/{transactionId}:
+    get:
+      description: example return confirms a payment on Hedera
+      parameters:
+      - description: Transaction ID in format '0.0.xxxx@seconds.nanos'
+        in: path
+        name: transactionId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Example confirm a payment
+      tags:
+      - Payment
   /receipt/:
     post:
       consumes:

@@ -355,7 +355,7 @@ const docTemplate = `{
             }
         },
         "/bills/update-bill": {
-            "put": {
+            "patch": {
                 "description": "Update Bill",
                 "produces": [
                     "application/json"
@@ -404,27 +404,6 @@ const docTemplate = `{
                     "Payment"
                 ],
                 "summary": "Check backend health",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/confirm-payment": {
-            "get": {
-                "description": "example return confirms a payment on Hedera",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Payment"
-                ],
-                "summary": "Example confirm a payment",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -759,6 +738,36 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to fetch HBAR rate"
+                    }
+                }
+            }
+        },
+        "/payments/confirm-payment/{transactionId}": {
+            "get": {
+                "description": "example return confirms a payment on Hedera",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Example confirm a payment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Transaction ID in format '0.0.xxxx@seconds.nanos'",
+                        "name": "transactionId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
                     }
                 }
             }
@@ -1166,7 +1175,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "isPaid": {
-                    "type": "boolean"
+                    "type": "string"
                 },
                 "participantId": {
                     "type": "string"
@@ -1270,7 +1279,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "isPaid": {
-                    "type": "boolean"
+                    "type": "string"
                 },
                 "participantId": {
                     "type": "string"
@@ -1400,8 +1409,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "isPaid": {
-                    "type": "boolean",
-                    "example": false
+                    "type": "string",
+                    "example": ""
                 },
                 "participantId": {
                     "type": "string",
@@ -1416,7 +1425,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "isPaid": {
-                    "type": "boolean"
+                    "type": "string"
                 },
                 "participantId": {
                     "type": "string"
