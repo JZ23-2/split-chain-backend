@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 func FetchHBARRate() (float64, error) {
-	url := "https://api.coingecko.com/api/v3/simple/price?ids=hedera-hashgraph&vs_currencies=usd"
+	url := "https://api.binance.com/api/v3/ticker/price?symbol=HBARUSDT"
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -16,14 +17,16 @@ func FetchHBARRate() (float64, error) {
 
 	defer res.Body.Close()
 
-	var result map[string]map[string]float64
+	var result struct {
+		Price string `json:"price"`
+	}
 
 	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
 		return 0, nil
 	}
 
-	usd := result["hedera-hashgraph"]["usd"]
-	if usd == 0 {
+	usd, err := strconv.ParseFloat(result.Price, 64)
+	if err != nil {
 		return 0, fmt.Errorf("invalid exchange rate")
 	}
 
