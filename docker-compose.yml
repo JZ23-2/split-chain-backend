@@ -1,9 +1,13 @@
 services:
-  split_backend:
+  split_chain_be:
     build: .
     image: split-be
-    container_name: split_backend
+    container_name: split_chain_be
     ports:
       - 8080:8080
     networks:
       - caddy_net
+
+networks:
+  caddy_net:
+    external: true
